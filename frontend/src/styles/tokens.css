@@ -1,0 +1,112 @@
+/* CBID Institute identity: navy, teal, green and orange from the institute logo.
+   The light canvas and compact white cards follow the chosen course-platform reference. */
+
+:root {
+  color-scheme: light;
+
+  /* surfaces */
+  --bg: #eff6f7;
+  --surface: #ffffff;
+  --surface-2: #f6fafb;
+  --surface-3: #e0eef0;
+  --ink: #0c334f;
+  --ink-2: #234d62;
+  --muted: #4d6a79;
+  --line: #d9e8eb;
+  --line-strong: #577b89;
+
+  /* brand */
+  --brand: #0c3c60;
+  --brand-hover: #082c48;
+  --brand-ink: #ffffff;
+  --brand-tint: #e1f0f3;
+  --link: #17667a;
+  --accent: #fc9024;
+  --accent-ink: #211300;
+  --teal: #247890;
+  --green: #6ca848;
+
+  /* semantic (always paired with an icon or text, never colour alone) */
+  --ok: #346f27;
+  --ok-bg: #e4f1dc;
+  --warn: #7a4f00;
+  --warn-bg: #fbefd2;
+  --danger: #a32121;
+  --danger-bg: #fbe9e7;
+  --info: #176579;
+  --info-bg: #e1f1f3;
+
+  /* wayfinding sign */
+  --sign-bg: #0a2f4c;
+  --sign-ink: #f4f8fb;
+  --sign-muted: #d0e2ea;
+  --sign-line: #35627a;
+
+  /* focus: orange halo + ink ring = visible on light and dark surfaces */
+  --focus-halo: #fc9024;
+  --focus-ring: #0f1e2b;
+
+  --font-display: 'DM Serif Text', Georgia, 'Times New Roman', serif;
+  --display-weight: 400; /* DM Serif Text ships one weight; never synthesise bold */
+  --font-body: 'Atkinson Hyperlegible Next Variable', 'Atkinson Hyperlegible', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: 'Atkinson Hyperlegible Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+
+  --text-xs: 0.8125rem;   /* 13px — badges only */
+  --text-sm: 0.875rem;    /* 14px — meta */
+  --text-md: 1rem;        /* 16px — body */
+  --text-lg: 1.125rem;    /* 18px — lede */
+  --text-xl: 1.375rem;    /* 22px — section */
+  --text-2xl: 1.75rem;    /* 28px — page */
+  --text-3xl: clamp(2.2rem, 1.8rem + 1.6vw, 3rem);
+
+  --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 20px; --s-6: 24px; --s-8: 32px; --s-10: 40px; --s-12: 48px;
+  --r-sm: 9px; --r-md: 14px; --r-lg: 20px; --r-pill: 999px;
+  --shadow-1: 0 2px 10px rgb(12 60 96 / 0.05);
+  --shadow-pop: 0 18px 45px rgb(8 42 69 / 0.18), 0 2px 8px rgb(8 42 69 / 0.07);
+
+  --topbar-h: 58px;
+  --content-max: 1160px;
+  --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    color-scheme: dark;
+    --bg: #0b242e;
+    --surface: #102e3a;
+    --surface-2: #173b48;
+    --surface-3: #22515e;
+    --ink: #eff8f6;
+    --ink-2: #d3e9ec;
+    --muted: #b2cdd1;
+    --line: #315762;
+    --line-strong: #88aab3;
+    --brand: #8dcbd5;
+    --brand-hover: #b1e0e5;
+    --brand-ink: #082431;
+    --brand-tint: #1b4754;
+    --link: #9bd9e2;
+    --teal: #77c3d0;
+    --green: #a6d58a;
+    --ok: #a6d58a; --ok-bg: #1c3c2b;
+    --warn: #ffc970; --warn-bg: #3b2d18;
+    --danger: #ffaaa2; --danger-bg: #3c211f; --danger-ink: #2a0606;
+    --info: #9bd9e2; --info-bg: #1b4754;
+    --sign-bg: #082431;
+    --sign-line: #315762;
+    --focus-ring: #fc9024;
+    --shadow-1: 0 2px 10px rgb(0 0 0 / 0.07);
+    --shadow-pop: 0 16px 40px rgb(0 0 0 / 0.5);
+  }
+}
+:root[data-theme='dark'] {
+  color-scheme: dark;
+  --bg: #0b242e; --surface: #102e3a; --surface-2: #173b48; --surface-3: #22515e;
+  --ink: #eff8f6; --ink-2: #d3e9ec; --muted: #b2cdd1; --line: #315762; --line-strong: #88aab3;
+  --brand: #8dcbd5; --brand-hover: #b1e0e5; --brand-ink: #082431; --brand-tint: #1b4754; --link: #9bd9e2;
+  --teal: #77c3d0; --green: #a6d58a;
+  --ok: #a6d58a; --ok-bg: #1c3c2b; --warn: #ffc970; --warn-bg: #3b2d18;
+  --danger: #ffaaa2; --danger-bg: #3c211f; --danger-ink: #2a0606; --info: #9bd9e2; --info-bg: #1b4754;
+  --sign-bg: #082431; --sign-line: #315762; --focus-ring: #fc9024;
+  --shadow-1: 0 2px 10px rgb(0 0 0 / 0.07); --shadow-pop: 0 16px 40px rgb(0 0 0 / 0.5);
+}

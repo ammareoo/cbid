@@ -1,0 +1,1420 @@
+{
+ "url": "http://127.0.0.1:5173/login",
+ "at": "2026-10-26T12:43:35.041Z",
+ "allow": [],
+ "viewports": [
+  {
+   "width": 1440,
+   "height": 900,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.59,
+    0.6
+   ],
+   "motion": {
+    "elements": 4,
+    "css": 4,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "page": {
+     "height": 1019,
+     "screens": 1.1,
+     "words": 162,
+     "img": 3,
+     "video": 0,
+     "canvas": 0,
+     "svg": 5,
+     "sections": 0,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Sign in",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 28,
+     "vw": 1.9,
+     "font": "DM Serif Text",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 216,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Sign in",
+     "words": 2,
+     "lines": 1,
+     "size": 28,
+     "font": "DM Serif Text"
+    },
+    "headings": [
+     {
+      "text": "Sign in",
+      "words": 2,
+      "chars": 7,
+      "lines": 1,
+      "size": 28,
+      "vw": 1.9,
+      "font": "DM Serif Text",
+      "weight": 400,
+      "tracking": -0.01,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "right",
+      "widthRatio": 0.31,
+      "top": 216,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Learn, innovate and implement inclusion.",
+      "words": 5,
+      "chars": 40,
+      "lines": 2,
+      "size": 40,
+      "vw": 2.8,
+      "font": "DM Serif Text",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "left",
+      "widthRatio": 0.43,
+      "top": 220,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Atkinson Hyperlegible Next Variable",
+       "share": 0.95,
+       "mono": false
+      },
+      {
+       "family": "DM Serif Text",
+       "share": 0.04,
+       "mono": false
+      },
+      {
+       "family": "Atkinson Hyperlegible Mono",
+       "share": 0,
+       "mono": true
+      }
+     ],
+     "familyCount": 3,
+     "sizes": [
+      14,
+      16,
+      28,
+      40
+     ],
+     "sizeCount": 4,
+     "notLoaded": [],
+     "body": {
+      "font": "Atkinson Hyperlegible Next Variable",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 57,
+     "max": {
+      "size": 40,
+      "vw": 2.8,
+      "font": "DM Serif Text",
+      "text": "Learn, innovate and implement inclusion."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [
+      "Atkinson Hyperlegible Mono"
+     ],
+     "monoSamples": [
+      "1",
+      "2",
+      "3",
+      "4"
+     ],
+     "microLabels": 3,
+     "microLabelShare": 0.096,
+     "microSamples": [
+      "CBID Institute learning platform",
+      "Centre of Excellence of CBID Network PK ",
+      "Your route to a certificate"
+     ],
+     "upperShare": 0.1,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "CBID Institute learning platform",
+      "above": "Sign in",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 14,
+      "top": 186
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0c141b",
+     "bodyBgHsl": {
+      "h": 208,
+      "s": 0.38,
+      "l": 0.08
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#07131e",
+       "top": 0,
+       "hsl": {
+        "h": 209,
+        "s": 0.62,
+        "l": 0.07
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#c6d6e4",
+       "share": 0.38
+      },
+      {
+       "color": "#f4f8fb",
+       "share": 0.24
+      },
+      {
+       "color": "#a9b8c6",
+       "share": 0.21
+      },
+      {
+       "color": "#e6edf3",
+       "share": 0.1
+      },
+      {
+       "color": "#9fd0f0",
+       "share": 0.06
+      }
+     ],
+     "button": {
+      "bg": "#8ec5ea",
+      "hsl": {
+       "h": 204,
+       "s": 0.69,
+       "l": 0.74
+      },
+      "fg": "#0b1622"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 8,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Sign in"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 1,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "input#_r_0_.input → rgb(252, 144, 36) 0px 0px 0px 3px"
+     ],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 4,
+     "hairlineSamples": [
+      "li 584px",
+      "li 584px",
+      "li 584px",
+      "div.auth__org 624px"
+     ],
+     "outlinedBoxes": 1,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 3,
+     "boxRadius": 10,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": null,
+    "fontsLoaded": [
+     "dm serif text",
+     "atkinson hyperlegible next variable",
+     "atkinson hyperlegible mono"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "pageH": 1019,
+    "margins": {
+     "left": 48,
+     "right": 140
+    },
+    "sections": [],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Sign in",
+      "size": 28,
+      "top": 216,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 860,
+      "n": 3
+     },
+     {
+      "x": 48,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 5,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0.17,
+    "voidBox": {
+     "x": 540,
+     "y": 120,
+     "w": 300,
+     "h": 720
+    }
+   },
+   "app": {
+    "viewport": {
+     "w": 1440,
+     "h": 900
+    },
+    "dark": true,
+    "ground": "#0c141b",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 48,
+     "right": 140
+    },
+    "hero": {
+     "text": "Sign in",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 28,
+     "vw": 1.9,
+     "font": "DM Serif Text",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 216,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 2,
+     "firstScreen": 2,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 2,
+     "radii": [
+      [
+       10,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 14
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      14,
+      16,
+      28,
+      40
+     ]
+    },
+    "title": {
+     "text": "Sign in",
+     "size": 28,
+     "top": 216
+    },
+    "colourShare": 0.024
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 768,
+   "height": 1024,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.36,
+    0.66
+   ],
+   "motion": {
+    "elements": 4,
+    "css": 4,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "page": {
+     "height": 1244,
+     "screens": 1.2,
+     "words": 129,
+     "img": 3,
+     "video": 0,
+     "canvas": 0,
+     "svg": 5,
+     "sections": 0,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Sign in",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 28,
+     "vw": 3.6,
+     "font": "DM Serif Text",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 150,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Sign in",
+     "words": 2,
+     "lines": 1,
+     "size": 28,
+     "font": "DM Serif Text"
+    },
+    "headings": [
+     {
+      "text": "Sign in",
+      "words": 2,
+      "chars": 7,
+      "lines": 1,
+      "size": 28,
+      "vw": 3.6,
+      "font": "DM Serif Text",
+      "weight": 400,
+      "tracking": -0.01,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.57,
+      "top": 150,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Learn, innovate and implement inclusion.",
+      "words": 5,
+      "chars": 40,
+      "lines": 1,
+      "size": 34.7,
+      "vw": 4.5,
+      "font": "DM Serif Text",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.96,
+      "top": 882,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 1,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 2,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Atkinson Hyperlegible Next Variable",
+       "share": 0.95,
+       "mono": false
+      },
+      {
+       "family": "DM Serif Text",
+       "share": 0.05,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      16,
+      28,
+      35
+     ],
+     "sizeCount": 4,
+     "notLoaded": [],
+     "body": {
+      "font": "Atkinson Hyperlegible Next Variable",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 57,
+     "max": {
+      "size": 34.7,
+      "vw": 4.5,
+      "font": "DM Serif Text",
+      "text": "Learn, innovate and implement inclusion."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 2,
+     "microLabelShare": 0.085,
+     "microSamples": [
+      "CBID Institute learning platform",
+      "Centre of Excellence of CBID Network PK "
+     ],
+     "upperShare": 0.09,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "CBID Institute learning platform",
+      "above": "Sign in",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 14,
+      "top": 120
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0c141b",
+     "bodyBgHsl": {
+      "h": 208,
+      "s": 0.38,
+      "l": 0.08
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#07131e",
+       "top": 798,
+       "hsl": {
+        "h": 209,
+        "s": 0.62,
+        "l": 0.07
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#c6d6e4",
+       "share": 0.46
+      },
+      {
+       "color": "#a9b8c6",
+       "share": 0.25
+      },
+      {
+       "color": "#e6edf3",
+       "share": 0.12
+      },
+      {
+       "color": "#f4f8fb",
+       "share": 0.1
+      },
+      {
+       "color": "#9fd0f0",
+       "share": 0.07
+      }
+     ],
+     "button": {
+      "bg": "#8ec5ea",
+      "hsl": {
+       "h": 204,
+       "s": 0.69,
+       "l": 0.74
+      },
+      "fg": "#0b1622"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 8,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Sign in"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 1,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "input#_r_0_.input → rgb(252, 144, 36) 0px 0px 0px 3px"
+     ],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 1,
+     "hairlineSamples": [
+      "div.auth__org 736px"
+     ],
+     "outlinedBoxes": 1,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 1,
+     "boxRadius": 10,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": null,
+    "fontsLoaded": [
+     "dm serif text",
+     "atkinson hyperlegible next variable"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "pageH": 1244,
+    "margins": {
+     "left": 16,
+     "right": 164
+    },
+    "sections": [
+     {
+      "sel": "main#main.auth__main",
+      "tag": "main",
+      "top": 0,
+      "height": 798,
+      "words": 65,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Sign in",
+       "size": 28,
+       "tag": "h1"
+      },
+      "left": 164,
+      "right": 164,
+      "textLeft": 164,
+      "textRight": 197,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "aside.auth__aside",
+      "tag": "aside",
+      "top": 798,
+      "height": 446,
+      "words": 76,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Learn, innovate and implement inclusion.",
+       "size": 35,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 118,
+      "textLeft": 16,
+      "textRight": 118,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Sign in",
+      "size": 28,
+      "top": 150,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 164,
+      "n": 3
+     },
+     {
+      "x": 16,
+      "n": 2
+     }
+    ],
+    "leftBlocks": 5,
+    "bodySize": 16,
+    "stage": false,
+    "explains": true,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 768,
+     "h": 1024
+    },
+    "dark": true,
+    "ground": "#0c141b",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 118
+    },
+    "hero": {
+     "text": "Sign in",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 28,
+     "vw": 3.6,
+     "font": "DM Serif Text",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 150,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 2,
+     "firstScreen": 1,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 2,
+     "radii": [
+      [
+       10,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 14
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      14,
+      16,
+      28,
+      35
+     ]
+    },
+    "title": {
+     "text": "Sign in",
+     "size": 28,
+     "top": 150
+    },
+    "colourShare": 0.034
+   },
+   "consoleErrors": []
+  },
+  {
+   "width": 390,
+   "height": 844,
+   "load": "load",
+   "screens": 2,
+   "filled": [
+    0.63,
+    0.88
+   ],
+   "motion": {
+    "elements": 4,
+    "css": 4,
+    "transitions": 0,
+    "scripted": 0,
+    "videos": 0,
+    "playingVideos": 0
+   },
+   "metrics": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "page": {
+     "height": 1398,
+     "screens": 1.7,
+     "words": 129,
+     "img": 3,
+     "video": 0,
+     "canvas": 0,
+     "svg": 5,
+     "sections": 0,
+     "horizontalOverflow": 0,
+     "overflowCulprits": [],
+     "uiFragments": 0,
+     "uiAbuse": false,
+     "realPictures": 0,
+     "videoCount": 0,
+     "uiPictures": 0,
+     "pictureSamples": [],
+     "blendText": 0,
+     "sideScrollers": 0,
+     "brokenImages": [],
+     "emoji": [],
+     "videosNoPoster": 0
+    },
+    "hero": {
+     "text": "Sign in",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 28,
+     "vw": 7.2,
+     "font": "DM Serif Text",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 150,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "h1": {
+     "text": "Sign in",
+     "words": 2,
+     "lines": 1,
+     "size": 28,
+     "font": "DM Serif Text"
+    },
+    "headings": [
+     {
+      "text": "Sign in",
+      "words": 2,
+      "chars": 7,
+      "lines": 1,
+      "size": 28,
+      "vw": 7.2,
+      "font": "DM Serif Text",
+      "weight": 400,
+      "tracking": -0.01,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 150,
+      "tag": "h1",
+      "kind": "heading"
+     },
+     {
+      "text": "Learn, innovate and implement inclusion.",
+      "words": 5,
+      "chars": 40,
+      "lines": 2,
+      "size": 30.4,
+      "vw": 7.8,
+      "font": "DM Serif Text",
+      "weight": 400,
+      "tracking": 0,
+      "leading": 1.2,
+      "upper": false,
+      "italic": false,
+      "mono": false,
+      "align": "left",
+      "position": "center",
+      "widthRatio": 0.92,
+      "top": 882,
+      "tag": "h2",
+      "kind": "heading"
+     }
+    ],
+    "headingSummary": {
+     "count": 2,
+     "maxLines": 2,
+     "over2Lines": 0,
+     "statements": 0,
+     "centered": 0,
+     "medianWords": 5,
+     "mixedFontHeadings": 0
+    },
+    "type": {
+     "families": [
+      {
+       "family": "Atkinson Hyperlegible Next Variable",
+       "share": 0.95,
+       "mono": false
+      },
+      {
+       "family": "DM Serif Text",
+       "share": 0.05,
+       "mono": false
+      }
+     ],
+     "familyCount": 2,
+     "sizes": [
+      14,
+      16,
+      28,
+      30
+     ],
+     "sizeCount": 4,
+     "notLoaded": [],
+     "body": {
+      "font": "Atkinson Hyperlegible Next Variable",
+      "size": 16,
+      "leading": 1.55,
+      "weight": 400,
+      "tracking": 0,
+      "contrast": 9.2
+     },
+     "measureChars": 45,
+     "max": {
+      "size": 30.4,
+      "vw": 7.8,
+      "font": "DM Serif Text",
+      "text": "Learn, innovate and implement inclusion."
+     },
+     "monoShare": 0,
+     "monoProseShare": 0,
+     "monoFamilies": [],
+     "monoSamples": [],
+     "microLabels": 2,
+     "microLabelShare": 0.085,
+     "microSamples": [
+      "CBID Institute learning platform",
+      "Centre of Excellence of CBID Network PK "
+     ],
+     "upperShare": 0.09,
+     "centerShare": 0.01,
+     "smallText": 0
+    },
+    "eyebrows": [
+     {
+      "text": "CBID Institute learning platform",
+      "above": "Sign in",
+      "upper": true,
+      "tracked": true,
+      "mono": false,
+      "pill": false,
+      "size": 14,
+      "top": 120
+     }
+    ],
+    "numbered": [],
+    "color": {
+     "bodyBg": "#0c141b",
+     "bodyBgHsl": {
+      "h": 208,
+      "s": 0.38,
+      "l": 0.08
+     },
+     "dark": true,
+     "sectionBgs": [
+      {
+       "color": "#07131e",
+       "top": 798,
+       "hsl": {
+        "h": 209,
+        "s": 0.62,
+        "l": 0.07
+       }
+      }
+     ],
+     "textColors": [
+      {
+       "color": "#c6d6e4",
+       "share": 0.46
+      },
+      {
+       "color": "#a9b8c6",
+       "share": 0.25
+      },
+      {
+       "color": "#e6edf3",
+       "share": 0.12
+      },
+      {
+       "color": "#f4f8fb",
+       "share": 0.1
+      },
+      {
+       "color": "#9fd0f0",
+       "share": 0.07
+      }
+     ],
+     "button": {
+      "bg": "#8ec5ea",
+      "hsl": {
+       "h": 204,
+       "s": 0.69,
+       "l": 0.74
+      },
+      "fg": "#0b1622"
+     },
+     "lowContrast": []
+    },
+    "buttons": {
+     "count": 1,
+     "inHero": 1,
+     "radius": 8,
+     "height": 44,
+     "withShadow": 0,
+     "withGradient": 0,
+     "mono": 0,
+     "upper": 0,
+     "heroLabels": [
+      "Sign in"
+     ]
+    },
+    "surfaces": {
+     "shadowStatic": 1,
+     "shadowOverlay": 0,
+     "shadowSamples": [
+      "input#_r_0_.input → rgb(252, 144, 36) 0px 0px 0px 3px"
+     ],
+     "gradients": 0,
+     "scrims": 0,
+     "gradientSamples": [],
+     "gradientText": 0,
+     "hairlines": 1,
+     "hairlineSamples": [
+      "div.auth__org 358px"
+     ],
+     "outlinedBoxes": 1,
+     "dashed": 1,
+     "blurred": 0,
+     "roundedBoxes": 1,
+     "boxRadius": 10,
+     "squareMedia": 0,
+     "roundedMedia": 0,
+     "mediaRadius": 0,
+     "textShadow": 0,
+     "cardRows": []
+    },
+    "heroMedia": [],
+    "nav": null,
+    "fontsLoaded": [
+     "dm serif text",
+     "atkinson hyperlegible next variable"
+    ]
+   },
+   "layout": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "pageH": 1398,
+    "margins": {
+     "left": 16,
+     "right": 16
+    },
+    "sections": [
+     {
+      "sel": "main#main.auth__main",
+      "tag": "main",
+      "top": 0,
+      "height": 798,
+      "words": 65,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Sign in",
+       "size": 28,
+       "tag": "h1"
+      },
+      "left": 16,
+      "right": 16,
+      "textLeft": 16,
+      "textRight": 18,
+      "fullBleed": false,
+      "footer": false,
+      "hero": true,
+      "continues": false,
+      "pinned": false
+     },
+     {
+      "sel": "aside.auth__aside",
+      "tag": "aside",
+      "top": 798,
+      "height": 600,
+      "words": 76,
+      "media": 0,
+      "middle": 0,
+      "heading": {
+       "text": "Learn, innovate and implement inclusion.",
+       "size": 30,
+       "tag": "h2"
+      },
+      "left": 16,
+      "right": 21,
+      "textLeft": 16,
+      "textRight": 21,
+      "fullBleed": false,
+      "footer": true,
+      "hero": false,
+      "continues": false,
+      "pinned": false
+     }
+    ],
+    "gaps": [],
+    "h1s": [
+     {
+      "text": "Sign in",
+      "size": 28,
+      "top": 150,
+      "firstScreen": true
+     }
+    ],
+    "edgeText": [],
+    "edges": [
+     {
+      "x": 16,
+      "n": 5
+     }
+    ],
+    "leftBlocks": 5,
+    "bodySize": 16,
+    "stage": false,
+    "explains": false,
+    "slivers": [],
+    "voidShare": 0,
+    "voidBox": null
+   },
+   "app": {
+    "viewport": {
+     "w": 390,
+     "h": 844
+    },
+    "dark": true,
+    "ground": "#0c141b",
+    "sidebar": null,
+    "topbar": null,
+    "canvas": {
+     "left": 16,
+     "right": 16
+    },
+    "hero": {
+     "text": "Sign in",
+     "words": 2,
+     "chars": 7,
+     "lines": 1,
+     "size": 28,
+     "vw": 7.2,
+     "font": "DM Serif Text",
+     "weight": 400,
+     "tracking": -0.01,
+     "leading": 1.2,
+     "top": 150,
+     "tag": "h1",
+     "kind": "heading",
+     "align": "left",
+     "position": "left"
+    },
+    "charts": 0,
+    "layout": {
+     "panels": 2,
+     "firstScreen": 1,
+     "ragged": [],
+     "voids": []
+    },
+    "tiles": 0,
+    "panels": {
+     "count": 2,
+     "radii": [
+      [
+       10,
+       1
+      ],
+      [
+       0,
+       1
+      ]
+     ],
+     "heavyBorders": 0,
+     "borderSamples": [],
+     "heavyShadows": 0,
+     "softShadows": 0,
+     "shadowSamples": [],
+     "glass": 0
+    },
+    "chips": {
+     "count": 0,
+     "hues": 0,
+     "samples": []
+    },
+    "numbers": {
+     "cells": 0,
+     "leftAligned": 0,
+     "figures": 1,
+     "tabularShare": 0,
+     "kpiMax": 14
+    },
+    "rows": null,
+    "chartHues": 0,
+    "placeholders": [],
+    "type": {
+     "under13": 0,
+     "tiny": 0,
+     "tinySamples": [],
+     "sizes": [
+      14,
+      16,
+      28,
+      30
+     ]
+    },
+    "title": {
+     "text": "Sign in",
+     "size": 28,
+     "top": 150
+    },
+    "colourShare": 0.064
+   },
+   "consoleErrors": []
+  }
+ ],
+ "findings": [
+  {
+   "level": "FAIL",
+   "id": "micro-label",
+   "width": 1440,
+   "message": "3 tiny uppercase letter-spaced labels (e.g. \"CBID Institute learning platform\", \"Centre of Excellence of CBID Network PK \", \"Your route to a certificate\").",
+   "fix": "Use sentence-case text at a readable size, or delete the label."
+  },
+  {
+   "level": "WARN",
+   "id": "dev-server",
+   "width": 1440,
+   "message": "This page is served by a development server (Vite, webpack or Next in dev mode).",
+   "fix": "Run the last gate on the production build too (vite build && vite preview, next build && next start, or the built index.html): minifiers and bundlers change the CSS a visitor receives.",
+   "alsoAt": [
+    768,
+    390
+   ]
+  },
+  {
+   "level": "WARN",
+   "id": "micro-label",
+   "width": 768,
+   "message": "2 tiny uppercase letter-spaced label(s): \"CBID Institute learning platform\", \"Centre of Excellence of CBID Network PK \"",
+   "fix": "Prefer sentence case at body size.",
+   "alsoAt": [
+    390
+   ]
+  }
+ ],
+ "images": [
+  {
+   "viewport": "desktop",
+   "width": 1440,
+   "fold": "C:\\Users\\Dell\\Downloads\\cbid-lms2\\cbid-lms2\\.taste-skill\\before-login\\desktop-fold.jpg",
+   "pages": [
+    "C:\\Users\\Dell\\Downloads\\cbid-lms2\\cbid-lms2\\.taste-skill\\before-login\\desktop-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "tablet",
+   "width": 768,
+   "fold": "C:\\Users\\Dell\\Downloads\\cbid-lms2\\cbid-lms2\\.taste-skill\\before-login\\tablet-fold.jpg",
+   "pages": [
+    "C:\\Users\\Dell\\Downloads\\cbid-lms2\\cbid-lms2\\.taste-skill\\before-login\\tablet-page-01.jpg"
+   ],
+   "film": []
+  },
+  {
+   "viewport": "mobile",
+   "width": 390,
+   "fold": "C:\\Users\\Dell\\Downloads\\cbid-lms2\\cbid-lms2\\.taste-skill\\before-login\\mobile-fold.jpg",
+   "pages": [
+    "C:\\Users\\Dell\\Downloads\\cbid-lms2\\cbid-lms2\\.taste-skill\\before-login\\mobile-page-01.jpg"
+   ],
+   "film": []
+  }
+ ]
+}

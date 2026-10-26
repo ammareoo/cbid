@@ -1,0 +1,27 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+storage/
+backend/storage/
+coverage/
+playwright-report/
+test-results/
+*.log
+.DS_Store
+.pgdata/
+
+# Local development
+.vscode/
+.idea/
+*.local
+*.sqlite
+*.sqlite3
+*.db
+tmp/
+temp/
+
+# OS files
+Thumbs.db
+desktop.ini
