@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # CBID Institute LMS
 
 The learning platform of **CBID Institute**, the Centre of Excellence of **CBID Network PK Sindh**
@@ -154,3 +155,7 @@ kept for 2 years and notifications for 180 days by default (`RETENTION_*` variab
 - **Changing the logos:** replace `frontend/src/assets/cbid-institute-logo.webp` and `cbid-network-logo.webp`
   (same names, transparent background). The bundled files are the 225 px high versions published on cbidnetwork.org;
   for print-quality certificates use original artwork (SVG, or PNG at least 600 px high).
+=======
+# cbid
+cbid institute lms
+>>>>>>> origin/main
