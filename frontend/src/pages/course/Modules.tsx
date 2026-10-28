@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowDown, ArrowUp, Check, EyeOff, FileText, Link2, Pencil, Plus, Trash2, Upload } from 'lucide-react';
+import { ArrowDown, ArrowUp, Check, Eye, EyeOff, FileText, Link2, Pencil, Plus, Trash2, Upload } from 'lucide-react';
 import { api } from '../../api/client';
 import type { CourseModule, ModuleItem } from '../../api/types';
 import { Badge, Checkbox, ConfirmDialog, Dialog, EmptyState, ErrorSummary, PublishBadge, QueryView, SectionTitle, SelectField, TextAreaField, TextField } from '../../components/ui';
@@ -123,31 +123,39 @@ export default function Modules() {
   const editable = isStaff && course.writable;
 
   return (
-    <>
-      <SectionTitle title="Course content" lede={isStaff ? 'Organise the course into modules. Use the arrow buttons to reorder; learners see published items only.' : 'Work through the modules in order. Tick items off as you finish them.'}
-        actions={editable && <button type="button" className="btn btn--primary" onClick={() => setModuleDialog({})}><Plus aria-hidden="true" />Add module</button>} />
+    <div className="course-modules">
+      <SectionTitle
+        title="Content"
+        lede={isStaff ? 'Modules and materials learners work through.' : 'Work through the modules in order.'}
+        actions={editable && <button type="button" className="btn btn--primary" onClick={() => setModuleDialog({})}><Plus aria-hidden="true" />Add module</button>}
+      />
       <QueryView q={q}>
         {(d) => d.modules.length === 0 ? <EmptyState title="No content yet">{isStaff ? 'Add a module to start building the course.' : 'Your trainer has not published any modules yet.'}</EmptyState> : (
-          <ol className="route" aria-label="Modules">
+          <ol className="route route--feed" aria-label="Modules">
             {d.modules.map((m, mi) => {
               const done = m.items.filter((i) => i.completed).length;
+              const allDone = m.items.length > 0 && done === m.items.length;
               return (
                 <li key={m.id} className="route-module">
                   <div className="route-module__head">
-                    <div className="stack-sm">
-                      <h3 style={{ fontFamily: 'var(--font-display)', fontWeight: 400, fontSize: '1.2rem' }}>{m.title}</h3>
-                      {m.description && <p className="muted">{m.description}</p>}
+                    <div className="route-module__copy">
+                      <h3 className="route-module__title">
+                        <span className="route-module__index tabular" aria-hidden="true">{mi + 1}</span>
+                        {m.title}
+                      </h3>
+                      {m.description && <p className="route-module__desc">{m.description}</p>}
                     </div>
-                    <div className="row">
+                    <div className="route-module__aside">
                       {isStaff ? <PublishBadge status={m.published ? 'published' : 'draft'} />
-                        : m.items.length > 0 && <Badge tone={done === m.items.length ? 'ok' : 'outline'}>{done} of {m.items.length} done</Badge>}
+                        : m.items.length > 0 && <Badge tone={allDone ? 'ok' : 'outline'}>{done}/{m.items.length}</Badge>}
                       {editable && (
-                        <>
-                          <button type="button" className="icon-btn" aria-label={`Move ${m.title} up`} disabled={mi === 0} onClick={() => move.mutate({ kind: 'modules', id: m.id, direction: 'up', label: m.title })}><ArrowUp aria-hidden="true" /></button>
-                          <button type="button" className="icon-btn" aria-label={`Move ${m.title} down`} disabled={mi === d.modules.length - 1} onClick={() => move.mutate({ kind: 'modules', id: m.id, direction: 'down', label: m.title })}><ArrowDown aria-hidden="true" /></button>
-                          <button type="button" className="icon-btn" aria-label={`Edit ${m.title}`} onClick={() => setModuleDialog({ module: m })}><Pencil aria-hidden="true" /></button>
-                          <button type="button" className="icon-btn" aria-label={`Delete ${m.title}`} onClick={() => setDeleting({ kind: 'module', id: m.id, title: m.title })}><Trash2 aria-hidden="true" /></button>
-                        </>
+                        <div className="route-tools" aria-label={`Actions for ${m.title}`}>
+                          <button type="button" className="route-tools__btn" aria-label={`Move ${m.title} up`} disabled={mi === 0} onClick={() => move.mutate({ kind: 'modules', id: m.id, direction: 'up', label: m.title })}><ArrowUp aria-hidden="true" /></button>
+                          <button type="button" className="route-tools__btn" aria-label={`Move ${m.title} down`} disabled={mi === d.modules.length - 1} onClick={() => move.mutate({ kind: 'modules', id: m.id, direction: 'down', label: m.title })}><ArrowDown aria-hidden="true" /></button>
+                          <span className="route-tools__sep" aria-hidden="true" />
+                          <button type="button" className="route-tools__btn" aria-label={`Edit ${m.title}`} onClick={() => setModuleDialog({ module: m })}><Pencil aria-hidden="true" /></button>
+                          <button type="button" className="route-tools__btn route-tools__btn--danger" aria-label={`Delete ${m.title}`} onClick={() => setDeleting({ kind: 'module', id: m.id, title: m.title })}><Trash2 aria-hidden="true" /></button>
+                        </div>
                       )}
                     </div>
                   </div>
@@ -155,35 +163,41 @@ export default function Modules() {
                     {m.items.map((it, ii) => {
                       const K = KIND[it.kind];
                       return (
-                        <li key={it.id} className="route-item">
-                          {isStaff ? <K.icon aria-hidden="true" width={20} height={20} color="var(--muted)" />
-                            : <span className={`route-item__dot${it.completed ? ' route-item__dot--done' : ''}`} aria-hidden="true">{it.completed && <Check />}</span>}
-                          <div className="stack-sm" style={{ minWidth: 0 }}>
-                            <Link to={`/courses/${course.id}/items/${it.id}`}>{it.title}{it.completed && <span className="sr-only"> (completed)</span>}</Link>
-                            <span className="meta">
-                              <span className="row" style={{ gap: 4 }}><K.icon aria-hidden="true" width={14} height={14} />{K.label}</span>
-                              {it.estimatedMinutes && <span>{it.estimatedMinutes} min</span>}
+                        <li key={it.id} className={`route-item${it.completed ? ' route-item--done' : ''}${!it.published ? ' route-item--hidden' : ''}`}>
+                          {isStaff ? (
+                            <span className="route-item__glyph" aria-hidden="true"><K.icon width={16} height={16} /></span>
+                          ) : (
+                            <span className={`route-item__dot${it.completed ? ' route-item__dot--done' : ''}`} aria-hidden="true">{it.completed && <Check />}</span>
+                          )}
+                          <div className="route-item__body">
+                            <Link className="route-item__link" to={`/courses/${course.id}/items/${it.id}`}>{it.title}{it.completed && <span className="sr-only"> (completed)</span>}</Link>
+                            <span className="route-item__meta">
+                              <span>{K.label}</span>
+                              {it.estimatedMinutes ? <span>{it.estimatedMinutes} min</span> : null}
                               {it.fileSize ? <span>{formatBytes(it.fileSize)}</span> : null}
-                              {isStaff && !it.published && <Badge tone="warn" icon={<EyeOff aria-hidden="true" />}>Hidden</Badge>}
+                              {isStaff && !it.published && <span className="route-item__hidden-tag"><EyeOff aria-hidden="true" width={12} height={12} />Hidden</span>}
                             </span>
                           </div>
                           {editable ? (
-                            <div className="row" style={{ gap: 0 }}>
-                              <button type="button" className="icon-btn" aria-label={`Move ${it.title} up`} disabled={ii === 0} onClick={() => move.mutate({ kind: 'items', id: it.id, direction: 'up', label: it.title })}><ArrowUp aria-hidden="true" /></button>
-                              <button type="button" className="icon-btn" aria-label={`Move ${it.title} down`} disabled={ii === m.items.length - 1} onClick={() => move.mutate({ kind: 'items', id: it.id, direction: 'down', label: it.title })}><ArrowDown aria-hidden="true" /></button>
-                              <button type="button" className="btn btn--ghost btn--sm" onClick={() => togglePublish.mutate({ kind: 'items', id: it.id, published: !it.published })}>{it.published ? 'Hide' : 'Publish'}<span className="sr-only"> {it.title}</span></button>
-                              <button type="button" className="icon-btn" aria-label={`Edit ${it.title}`} onClick={() => editItem(it)}><Pencil aria-hidden="true" /></button>
-                              <button type="button" className="icon-btn" aria-label={`Delete ${it.title}`} onClick={() => setDeleting({ kind: 'item', id: it.id, title: it.title })}><Trash2 aria-hidden="true" /></button>
+                            <div className="route-tools" aria-label={`Actions for ${it.title}`}>
+                              <button type="button" className="route-tools__btn" aria-label={`Move ${it.title} up`} disabled={ii === 0} onClick={() => move.mutate({ kind: 'items', id: it.id, direction: 'up', label: it.title })}><ArrowUp aria-hidden="true" /></button>
+                              <button type="button" className="route-tools__btn" aria-label={`Move ${it.title} down`} disabled={ii === m.items.length - 1} onClick={() => move.mutate({ kind: 'items', id: it.id, direction: 'down', label: it.title })}><ArrowDown aria-hidden="true" /></button>
+                              <span className="route-tools__sep" aria-hidden="true" />
+                              <button type="button" className="route-tools__btn" aria-label={it.published ? `Hide ${it.title}` : `Publish ${it.title}`} onClick={() => togglePublish.mutate({ kind: 'items', id: it.id, published: !it.published })}>
+                                {it.published ? <EyeOff aria-hidden="true" /> : <Eye aria-hidden="true" />}
+                              </button>
+                              <button type="button" className="route-tools__btn" aria-label={`Edit ${it.title}`} onClick={() => editItem(it)}><Pencil aria-hidden="true" /></button>
+                              <button type="button" className="route-tools__btn route-tools__btn--danger" aria-label={`Delete ${it.title}`} onClick={() => setDeleting({ kind: 'item', id: it.id, title: it.title })}><Trash2 aria-hidden="true" /></button>
                             </div>
-                          ) : <span />}
+                          ) : null}
                         </li>
                       );
                     })}
-                    {m.items.length === 0 && <li className="route-item"><span /><span className="muted">No items in this module yet.</span><span /></li>}
+                    {m.items.length === 0 && <li className="route-item route-item--empty"><span className="route-item__glyph route-item__glyph--empty" aria-hidden="true" /><span className="muted">No items yet.</span></li>}
                   </ol>
                   {editable && (
-                    <div style={{ padding: '0 var(--s-5) var(--s-4)' }}>
-                      <button type="button" className="btn btn--secondary btn--sm" onClick={() => setItemDialog({ moduleId: m.id })}><Plus aria-hidden="true" />Add material<span className="sr-only"> to {m.title}</span></button>
+                    <div className="route-module__foot">
+                      <button type="button" className="btn btn--ghost btn--sm" onClick={() => setItemDialog({ moduleId: m.id })}><Plus aria-hidden="true" />Add material<span className="sr-only"> to {m.title}</span></button>
                     </div>
                   )}
                 </li>
@@ -197,6 +211,6 @@ export default function Modules() {
       <ConfirmDialog open={!!deleting} onClose={() => setDeleting(null)} danger confirmLabel="Delete" busy={remove.isPending}
         title={`Delete “${deleting?.title ?? ''}”?`} onConfirm={() => deleting && remove.mutate(deleting)}
         body={<p>{deleting?.kind === 'module' ? 'The module and every item in it will be removed. Learner progress on those items is also removed.' : 'Learners will no longer see this item.'} This cannot be undone.</p>} />
-    </>
+    </div>
   );
 }

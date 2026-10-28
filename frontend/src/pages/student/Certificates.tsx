@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Award } from 'lucide-react';
+import { Award, ChevronRight } from 'lucide-react';
 import { api } from '../../api/client';
 import type { Certificate } from '../../api/types';
 import { Badge, EmptyState, PageHeader, QueryView } from '../../components/ui';
@@ -20,21 +20,32 @@ export default function Certificates() {
             Your trainer issues a certificate when you complete a course and its assessment.
           </EmptyState>
         ) : (
-          <ul className="course-grid">
+          <ul className="my-certs" aria-label="Your certificates">
             {d.items.map((c) => (
-              <li key={c.id}>
-                <article className="course-card" aria-labelledby={`cert-${c.id}`}>
-                  <div className="course-card__top">
+              <li key={c.id} className="my-certs__row">
+                <div className="my-certs__glyph" aria-hidden="true">
+                  <Award />
+                </div>
+                <div className="my-certs__main">
+                  <div className="my-certs__top">
                     <span className="code-tag">{c.courseCode}</span>
-                    {c.revokedAt ? <Badge tone="danger">Revoked</Badge> : <Badge tone="ok" icon={<Award aria-hidden="true" />}>Valid</Badge>}
+                    {c.revokedAt
+                      ? <Badge tone="danger">Revoked</Badge>
+                      : <Badge tone="ok" icon={<Award aria-hidden="true" />}>Valid</Badge>}
                   </div>
-                  <h2 id={`cert-${c.id}`} className="course-card__title">{c.courseTitle}</h2>
-                  <p className="meta">Issued {formatDate(c.issuedAt)}</p>
-                  <p className="meta">Serial <span className="serial">{c.serial}</span></p>
-                  <div className="course-card__foot">
-                    <Link className="btn btn--secondary btn--sm" to={`/certificates/${c.id}`}>View and print<span className="sr-only"> certificate for {c.courseTitle}</span></Link>
-                  </div>
-                </article>
+                  <p className="my-certs__title">{c.courseTitle}</p>
+                  <p className="my-certs__meta">
+                    <span>Issued {formatDate(c.issuedAt)}</span>
+                    <span className="my-certs__serial">Serial <span className="serial">{c.serial}</span></span>
+                  </p>
+                </div>
+                <div className="my-certs__actions">
+                  <Link className="btn btn--secondary btn--sm" to={`/certificates/${c.id}`}>
+                    View and print
+                    <span className="sr-only"> certificate for {c.courseTitle}</span>
+                    <ChevronRight aria-hidden="true" />
+                  </Link>
+                </div>
               </li>
             ))}
           </ul>

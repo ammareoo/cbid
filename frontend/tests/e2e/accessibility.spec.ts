@@ -1,6 +1,6 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test, type Page } from '@playwright/test';
-import { signIn, USERS } from './helpers';
+import { signIn, signOut, USERS } from './helpers';
 
 /** Automated WCAG 2.2 A/AA checks with axe-core. Automated checks catch roughly a third of issues;
  *  they complement, not replace, manual screen-reader and keyboard testing. */
@@ -47,7 +47,7 @@ test('trainer and administrator pages have no serious accessibility violations',
   await audit(page, 'gradebook');
   await page.getByRole('navigation', { name: 'Course sections' }).getByRole('link', { name: 'Certificates' }).click();
   await audit(page, 'course certificates');
-  await page.getByRole('button', { name: 'Sign out' }).first().click();
+  await signOut(page);
   await signIn(page, USERS.admin);
   await audit(page, 'admin overview');
   await page.goto('/admin/users');

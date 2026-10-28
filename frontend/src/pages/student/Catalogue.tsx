@@ -4,7 +4,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { CheckCircle2, MapPin, Search, UserRound, Users } from 'lucide-react';
 import { api, qs } from '../../api/client';
 import { DELIVERY_LABEL, type CatalogueCourse, type DeliveryMode, type Paged } from '../../api/types';
-import { Badge, ConfirmDialog, EmptyState, PageHeader, Pagination, QueryView } from '../../components/ui';
+import { Badge, ConfirmDialog, EmptyState, PageHeader, Pagination, QueryView, Select } from '../../components/ui';
 import { CourseCover, TeacherAvatar } from '../../components/CourseMedia';
 import { useToast } from '../../components/Toast';
 import { Page } from '../../layouts/AppShell';
@@ -53,10 +53,10 @@ export default function Catalogue() {
         </div>
         <div className="field" style={{ flex: '0 1 260px' }}>
           <label htmlFor="cat-mode">How it is delivered</label>
-          <select id="cat-mode" className="input" value={mode} onChange={(e) => { setMode(e.target.value as DeliveryMode | ''); setPage(1); }}>
+          <Select id="cat-mode" value={mode} onChange={(e) => { setMode(e.target.value as DeliveryMode | ''); setPage(1); }}>
             <option value="">All formats</option>
             {(Object.keys(DELIVERY_LABEL) as DeliveryMode[]).map((m) => <option key={m} value={m}>{DELIVERY_LABEL[m]}</option>)}
-          </select>
+          </Select>
         </div>
       </div>
       <QueryView q={q}>

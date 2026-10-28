@@ -15,8 +15,6 @@ const MyCourses = lazy(() => import('./pages/shared/MyCourses'));
 const Catalogue = lazy(() => import('./pages/student/Catalogue'));
 const StudentGrades = lazy(() => import('./pages/student/Grades'));
 const CalendarPage = lazy(() => import('./pages/shared/Calendar'));
-const Notifications = lazy(() => import('./pages/shared/Notifications'));
-const AnnouncementsFeed = lazy(() => import('./pages/shared/AnnouncementsFeed'));
 const SettingsPage = lazy(() => import('./pages/shared/Settings'));
 
 const CourseLayout = lazy(() => import('./pages/course/CourseLayout'));
@@ -81,8 +79,8 @@ export default function App() {
           <Route path="catalogue" element={<RequireAuth roles={['student']}><Catalogue /></RequireAuth>} />
           <Route path="grades" element={<RequireAuth roles={['student']}><StudentGrades /></RequireAuth>} />
           <Route path="calendar" element={<CalendarPage />} />
-          <Route path="notifications" element={<Notifications />} />
-          <Route path="announcements" element={<AnnouncementsFeed />} />
+          <Route path="notifications" element={<Navigate to="/" replace />} />
+          <Route path="announcements" element={<Navigate to="/dashboard" replace />} />
           <Route path="settings" element={<SettingsPage />} />
           <Route path="certificates" element={<RequireAuth roles={['student']}><Certificates /></RequireAuth>} />
           <Route path="certificates/:certificateId" element={<CertificateView />} />

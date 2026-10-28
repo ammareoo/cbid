@@ -4,8 +4,7 @@ import { Award, BookOpen, ClipboardList, FileQuestion, GraduationCap, Home, Mega
 import { api } from '../../api/client';
 import type { CourseDetail } from '../../api/types';
 import { Badge, ErrorState, Loading } from '../../components/ui';
-import { CourseCover } from '../../components/CourseMedia';
-import { useUser } from '../../auth/AuthProvider';
+import { coursePhoto, coursePhotoFocus } from '../../components/CourseMedia';
 
 export interface CourseCtx { course: CourseDetail; isStaff: boolean }
 export const useCourse = () => useOutletContext<CourseCtx>();
@@ -17,7 +16,6 @@ export function useCourseQuery(courseId: string) {
 export default function CourseLayout() {
   const { courseId = '' } = useParams();
   const q = useCourseQuery(courseId);
-  const user = useUser();
   if (q.isPending) return <div className="content"><Loading label="Loading course" /></div>;
   if (q.isError) return <div className="content"><ErrorState error={q.error} onRetry={() => q.refetch()} /></div>;
   const course = q.data;
@@ -33,32 +31,47 @@ export default function CourseLayout() {
     ...(isStaff ? [{ to: `${base}/students`, label: 'Learners', icon: Users }, { to: `${base}/certificates`, label: 'Certificates', icon: Award }] : []),
   ];
   const canSeeTabs = isStaff || course.relationship === 'learner';
+
   return (
-    <>
-      <div className="course-head">
-        <div className="course-head__inner">
-          <CourseCover courseKey={course.code || course.id} className="course-head__cover" />
-          <div className="row" style={{ gap: 8 }}>
-            <span className="code-tag">{course.code}</span>
-            <span className="meta">{course.termName}</span>
-            {course.status !== 'published' && <Badge tone={course.status === 'archived' ? 'outline' : 'warn'}>{course.status === 'archived' ? 'Archived · read-only' : 'Draft · not visible to learners'}</Badge>}
-            {isStaff && <Badge tone="brand">{user.role === 'admin' ? 'Administrator view' : 'You are a trainer on this course'}</Badge>}
+    <div className="course-shell">
+      <header
+        className="course-head"
+        style={{
+          '--course-head-photo': `url(${coursePhoto(course.code || course.id)})`,
+          '--course-head-focus': coursePhotoFocus(course.code || course.id),
+        } as React.CSSProperties}
+      >
+        <div className="course-head__hero">
+          <div className="course-head__inner">
+            <div className="course-head__meta">
+              <span className="code-tag">{course.code}</span>
+              <span className="meta">{course.termName}</span>
+              {course.status !== 'published' && (
+                <Badge tone={course.status === 'archived' ? 'outline' : 'warn'}>
+                  {course.status === 'archived' ? 'Archived · read-only' : 'Draft · not visible to learners'}
+                </Badge>
+              )}
+            </div>
+            <h1 tabIndex={-1} data-page-heading className="course-head__title">{course.title}</h1>
           </div>
-          <h1 style={{ fontSize: 'var(--text-3xl)', lineHeight: 1.15 }}>{course.title}</h1>
-          {canSeeTabs && (
-            <nav aria-label="Course sections">
-              <div className="tabs">
+        </div>
+        {canSeeTabs && (
+          <div className="course-head__nav-wrap">
+            <nav className="course-head__nav" aria-label="Course sections">
+              <div className="tabs tabs--course">
                 {tabs.map((t) => (
                   <NavLink key={t.to} to={t.to} end={t.end}><t.icon aria-hidden="true" />{t.label}</NavLink>
                 ))}
               </div>
             </nav>
-          )}
+          </div>
+        )}
+      </header>
+      <div className="content content--course">
+        <div className="course-page">
+          <Outlet context={{ course, isStaff } satisfies CourseCtx} />
         </div>
       </div>
-      <div className="content">
-        <Outlet context={{ course, isStaff } satisfies CourseCtx} />
-      </div>
-    </>
+    </div>
   );
 }

@@ -49,8 +49,8 @@ test('trainer grades the submission and releases feedback', async ({ page }) => 
 
 test('learner sees the released grade and a notification', async ({ page }) => {
   await signIn(page, USERS.student);
-  await page.getByRole('link', { name: /Notifications, \d+ unread/ }).click();
-  await page.getByRole('link', { name: 'Grade released: Short barrier report' }).click();
+  await page.getByRole('button', { name: /Notifications, \d+ unread/ }).click();
+  await page.getByRole('dialog', { name: 'Notifications' }).getByRole('link', { name: 'Grade released: Short barrier report' }).click();
   await expect(page.getByText('Clear barrier and a practical fix. Add who approves the budget.')).toBeVisible();
   await expect(page.getByText('/ 50 (88%)')).toBeVisible();
   await signOut(page);
@@ -82,7 +82,7 @@ test('learner takes a timed quiz that is scored on the server', async ({ page })
 
 test('administrator creates a person, creates and publishes a course', async ({ page }) => {
   await signIn(page, USERS.admin);
-  await expect(page.getByRole('heading', { name: 'Institute overview' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Overview' })).toBeVisible();
 
   await page.getByRole('navigation', { name: 'Main' }).first().getByRole('link', { name: 'People' }).click();
   await page.getByRole('button', { name: 'Add a person' }).click();
@@ -136,8 +136,7 @@ test('trainer issues a certificate that the learner can print and anyone can ver
 
   // A signed-out visitor (e.g. an employer) checks the serial.
   const visitor = await browser.newPage();
-  await visitor.goto('/login');
-  await visitor.getByRole('link', { name: 'Verify a certificate' }).click();
+  await visitor.goto('/verify');
   await visitor.getByLabel('Serial number').fill(serial.toLowerCase());
   await visitor.getByRole('button', { name: 'Check certificate' }).click();
   await expect(visitor.getByText('Valid certificate')).toBeVisible();

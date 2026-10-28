@@ -1,15 +1,14 @@
 import { useState, type FormEvent } from 'react';
 import { Link, Navigate, useLocation, useNavigate } from 'react-router-dom';
-import { BadgeCheck, LogIn } from 'lucide-react';
+import { LogIn } from 'lucide-react';
 import { homeFor, useAuth } from '../../auth/AuthProvider';
 import { ErrorSummary, TextField } from '../../components/ui';
-import { useBranding, useDocumentTitle } from '../../hooks/misc';
+import { useDocumentTitle } from '../../hooks/misc';
 import { AuthLayout } from './AuthLayout';
 
 export default function Login() {
   useDocumentTitle('Sign in');
   const { user, login } = useAuth();
-  const support = useBranding().support_email;
   const navigate = useNavigate();
   const location = useLocation();
   const [email, setEmail] = useState('');
@@ -42,31 +41,43 @@ export default function Login() {
 
   return (
     <AuthLayout>
-      <div className="stack-sm">
-        <p className="eyebrow">CBID Institute learning platform</p>
-        <h1>Sign in</h1>
-        <p className="muted">Use the email address your CBID Institute account was created with.</p>
+      <div className="auth__panel">
+        <header className="auth__panel-head">
+          <h1>Sign in</h1>
+          <p className="auth__panel-lede">Use the email for your CBID Institute account.</p>
+        </header>
+        <form className="auth__panel-form" onSubmit={submit} noValidate>
+          <ErrorSummary error={error} />
+          <TextField
+            label="Email address"
+            type="email"
+            name="email"
+            autoComplete="username"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={missing.email}
+            autoFocus
+          />
+          <TextField
+            label="Password"
+            type="password"
+            name="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={missing.password}
+          />
+          <div className="auth__panel-actions">
+            <button className="btn btn--primary btn--block" type="submit" disabled={busy}>
+              {busy ? <span className="spinner" aria-hidden="true" /> : <LogIn aria-hidden="true" />}
+              {busy ? 'Signing in…' : 'Sign in'}
+            </button>
+            <p className="auth__panel-forgot">
+              <Link to="/forgot-password">Forgot your password?</Link>
+            </p>
+          </div>
+        </form>
       </div>
-      <form className="stack" onSubmit={submit} noValidate>
-        <ErrorSummary error={error} />
-        <TextField label="Email address" type="email" name="email" autoComplete="username" value={email}
-          onChange={(e) => setEmail(e.target.value)} error={missing.email} autoFocus />
-        <TextField label="Password" type="password" name="password" autoComplete="current-password" value={password}
-          onChange={(e) => setPassword(e.target.value)} error={missing.password} />
-        <button className="btn btn--primary btn--block" type="submit" disabled={busy}>
-          {busy ? <span className="spinner" aria-hidden="true" /> : <LogIn aria-hidden="true" />}
-          {busy ? 'Signing in…' : 'Sign in'}
-        </button>
-        <p><Link to="/forgot-password">Forgot your password?</Link></p>
-      </form>
-      <div className="panel panel--quiet">
-        <div className="panel__body row" style={{ gap: 12, alignItems: 'flex-start', flexWrap: 'nowrap' }}>
-          <BadgeCheck aria-hidden="true" style={{ flex: 'none', color: 'var(--brand)' }} />
-          <p>Checking a CBID Institute certificate? <Link to="/verify">Verify a certificate</Link> with its serial number. No account needed.</p>
-        </div>
-      </div>
-      <p className="meta">Accessibility help: if anything on this page does not work with your assistive technology,
-        email <a href={`mailto:${support}`}>{support}</a> and we will help another way.</p>
     </AuthLayout>
   );
 }

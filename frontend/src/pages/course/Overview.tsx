@@ -1,10 +1,10 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, Award, Pencil } from 'lucide-react';
+import { ArrowRight, Award, BookOpen, Calendar, GraduationCap, MapPin, Pencil, Users } from 'lucide-react';
 import { api } from '../../api/client';
 import { DELIVERY_LABEL, type CourseModule } from '../../api/types';
-import { ConfirmDialog, Dialog, ErrorSummary, Notice, ProgressBar, TextAreaField, TextField } from '../../components/ui';
+import { ConfirmDialog, Dialog, ErrorSummary, Notice, SectionTitle, TextAreaField, TextField } from '../../components/ui';
 import { Markdown } from '../../components/Markdown';
 import { TeacherAvatar } from '../../components/CourseMedia';
 import { useToast } from '../../components/Toast';
@@ -44,6 +44,7 @@ export default function Overview() {
   const [editing, setEditing] = useState(false);
   const [leaving, setLeaving] = useState(false);
   const learner = course.relationship === 'learner';
+  const progress = Math.min(100, Math.max(0, course.progress ?? 0));
   const modules = useQuery({
     queryKey: ['modules', course.id],
     queryFn: () => api.get<{ modules: CourseModule[] }>(`/courses/${course.id}/modules`),
@@ -56,62 +57,183 @@ export default function Overview() {
     onError: (e: Error) => { toast(e.message, 'error'); setLeaving(false); },
   });
 
+  const assessmentNote = course.deliveryMode === 'online'
+    ? 'Online coursework and quizzes. Completing learners receive a CBID Institute certificate.'
+    : 'Online coursework, then a supervised assessment at CBID Institute, Karachi. Completing learners receive a CBID Institute certificate.';
+
+  const hasAbout = Boolean(course.summary || course.description);
+
   return (
-    <div className="columns">
-      <div className="stack-lg">
-        <section className="stack" aria-labelledby="about-h">
-          <div className="row-between">
-            <h2 id="about-h" tabIndex={-1} data-page-heading>About this course</h2>
-            {isStaff && course.writable && <button type="button" className="btn btn--secondary btn--sm" onClick={() => setEditing(true)}><Pencil aria-hidden="true" />Edit details</button>}
+    <div className="course-overview">
+      {learner && (
+        <section className="overview-mobile-cta" aria-label="Continue learning">
+          <div className="overview-mobile-cta__ring" style={{ '--overview-p': progress } as React.CSSProperties}>
+            <span className="overview-mobile-cta__pct tabular">{progress}%</span>
           </div>
-          <p className="muted" style={{ fontSize: 'var(--text-lg)', maxWidth: '62ch' }}>{course.summary}</p>
-          {course.description ? <Markdown source={course.description} /> : <p className="muted">No description yet.</p>}
+          <div className="overview-mobile-cta__copy">
+            <p className="overview-mobile-cta__label">Your progress</p>
+            {nextItem ? (
+              <Link className="overview-mobile-cta__link" to={`/courses/${course.id}/items/${nextItem.id}`}>
+                Continue · {nextItem.title}
+                <ArrowRight aria-hidden="true" width={18} height={18} />
+              </Link>
+            ) : modules.data ? (
+              <p className="overview-mobile-cta__done">All published content complete</p>
+            ) : null}
+          </div>
         </section>
+      )}
+
+      <article className="overview-main" aria-labelledby="about-h">
+        <SectionTitle
+          title="About"
+          headingId="about-h"
+          actions={isStaff && course.writable && (
+            <button type="button" className="icon-btn" aria-label="Edit course details" onClick={() => setEditing(true)}>
+              <Pencil aria-hidden="true" />
+            </button>
+          )}
+        />
+        {!hasAbout ? (
+          <p className="overview-main__empty muted">No description yet.{isStaff && course.writable ? ' Use edit to add a summary and details.' : ''}</p>
+        ) : (
+          <>
+            {course.summary && <p className="overview-bio">{course.summary}</p>}
+            {course.description && (
+              <div className="overview-article">
+                <Markdown source={course.description} className="prose overview-prose" />
+              </div>
+            )}
+          </>
+        )}
+
+        <div className="overview-main__extras">
+          {course.audience && (
+            <section className="overview-block" aria-labelledby="overview-audience-h">
+              <h3 id="overview-audience-h" className="overview-block__title">Who it is for</h3>
+              <p className="overview-block__text overview-block__text--accent">{course.audience}</p>
+            </section>
+          )}
+          <section className="overview-block overview-block--assessment" aria-labelledby="overview-assessment-h">
+            <h3 id="overview-assessment-h" className="overview-block__title">
+              <GraduationCap aria-hidden="true" width={16} height={16} />
+              Assessment
+            </h3>
+            <p className="overview-block__text">{assessmentNote}</p>
+          </section>
+          <section className="overview-block" aria-labelledby="overview-team-h">
+            <h3 id="overview-team-h" className="overview-block__title">Training team</h3>
+            {course.teachers.length ? (
+              <ul className="overview-team">
+                {course.teachers.map((t) => (
+                  <li key={t.id} className="overview-team__person">
+                    <TeacherAvatar />
+                    <span className="overview-team__meta">
+                      <span className="overview-team__name">{t.fullName}</span>
+                      {t.isLead && <span className="overview-team__role">Lead trainer</span>}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="overview-block__text muted">To be assigned</p>
+            )}
+          </section>
+        </div>
+      </article>
+
+      <aside className="overview-rail" aria-label="Course details">
+        <div className="overview-sheet">
+          {learner && (
+            <div className="overview-sheet__hero">
+              <div className="overview-sheet__hero-row">
+                <div className="overview-ring" style={{ '--overview-p': progress } as React.CSSProperties} role="img" aria-label={`${progress} percent complete`}>
+                  <span className="overview-ring__inner tabular">{progress}%</span>
+                </div>
+                <div className="overview-sheet__hero-copy">
+                  <p className="overview-sheet__hero-label">Progress</p>
+                  <p className="overview-sheet__hero-stat">Content completed</p>
+                </div>
+              </div>
+              {nextItem ? (
+                <Link className="btn btn--primary btn--block overview-sheet__continue" to={`/courses/${course.id}/items/${nextItem.id}`}>
+                  <span className="overview-sheet__continue-main">Continue</span>
+                  <span className="overview-sheet__continue-sub">{nextItem.title}</span>
+                </Link>
+              ) : modules.data ? (
+                <p className="overview-sheet__hero-note">You have finished all published modules.</p>
+              ) : null}
+            </div>
+          )}
+
+          <div className="overview-sheet__body">
+            <ul className="overview-facts">
+              <li className="overview-facts__item overview-facts__item--wide">
+                <Calendar className="overview-facts__icon" aria-hidden="true" width={17} height={17} />
+                <div className="overview-facts__copy">
+                  <span className="overview-facts__label">Term</span>
+                  <span className="overview-facts__value">{course.termName}</span>
+                  <span className="overview-facts__hint">{formatDate(course.termStartsOn)} – {formatDate(course.termEndsOn)}</span>
+                </div>
+              </li>
+              <li className="overview-facts__item">
+                <MapPin className="overview-facts__icon" aria-hidden="true" width={17} height={17} />
+                <div className="overview-facts__copy">
+                  <span className="overview-facts__label">Delivery</span>
+                  <span className="overview-facts__value">{DELIVERY_LABEL[course.deliveryMode]}</span>
+                </div>
+              </li>
+              <li className="overview-facts__item">
+                <Users className="overview-facts__icon" aria-hidden="true" width={17} height={17} />
+                <div className="overview-facts__copy">
+                  <span className="overview-facts__label">Enrolled</span>
+                  <span className="overview-facts__value">
+                    {course.enrolledCount}{course.capacity ? ` / ${course.capacity}` : ''}
+                  </span>
+                  {course.capacity ? (
+                    <span
+                      className="overview-facts__meter"
+                      role="presentation"
+                      style={{ '--enroll-p': `${Math.min(100, (course.enrolledCount / course.capacity) * 100)}%` } as React.CSSProperties}
+                    />
+                  ) : null}
+                </div>
+              </li>
+              {course.departmentName && (
+                <li className="overview-facts__item overview-facts__item--wide">
+                  <BookOpen className="overview-facts__icon" aria-hidden="true" width={17} height={17} />
+                  <div className="overview-facts__copy">
+                    <span className="overview-facts__label">Programme</span>
+                    <span className="overview-facts__value">{course.departmentName}</span>
+                  </div>
+                </li>
+              )}
+            </ul>
+
+            {learner && course.certificate && (
+              <div className="overview-sheet__cert">
+                <Award aria-hidden="true" width={20} height={20} />
+                <div>
+                  <p className="overview-sheet__cert-title">Certificate awarded</p>
+                  <p className="meta">{formatDate(course.certificate.issuedAt)} · <span className="serial">{course.certificate.serial}</span></p>
+                  <Link className="btn btn--secondary btn--sm" to={`/certificates/${course.certificate.id}`}>View certificate</Link>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
         {course.relationship === 'visitor' && (
           <Notice><p>You are viewing the public outline. <Link to="/catalogue">Enrol from the catalogue</Link> to see modules, assignments and quizzes.</p></Notice>
         )}
-      </div>
-      <aside className="stack" aria-label="Course facts">
-        {learner && (
-          <section className="panel" aria-labelledby="prog-h">
-            <div className="panel__body stack">
-              <h2 id="prog-h" style={{ fontSize: 'var(--text-lg)' }}>Your progress</h2>
-              <ProgressBar value={course.progress} label="Content completed" />
-              {nextItem ? (
-                <Link className="btn btn--primary" to={`/courses/${course.id}/items/${nextItem.id}`}>Continue: {nextItem.title}<ArrowRight aria-hidden="true" /></Link>
-              ) : modules.data ? <p className="muted">You have completed all published content.</p> : null}
-            </div>
-          </section>
-        )}
-        {learner && course.certificate && (
-          <section className="panel panel--accent" aria-labelledby="cert-h">
-            <div className="panel__body stack-sm">
-              <h2 id="cert-h" className="row" style={{ fontSize: 'var(--text-lg)', gap: 8 }}><Award aria-hidden="true" />Certificate awarded</h2>
-              <p className="muted">Issued {formatDate(course.certificate.issuedAt)} · serial <span className="serial">{course.certificate.serial}</span></p>
-              <Link className="btn btn--secondary btn--sm" to={`/certificates/${course.certificate.id}`}>View and print</Link>
-            </div>
-          </section>
-        )}
-        <section className="panel" aria-labelledby="facts-h">
-          <div className="panel__body stack-sm">
-            <h2 id="facts-h" style={{ fontSize: 'var(--text-lg)' }}>Course facts</h2>
-            <dl className="stack-sm" style={{ margin: 0 }}>
-              <div><dt className="meta">Term</dt><dd style={{ margin: 0 }}>{course.termName} ({formatDate(course.termStartsOn)} – {formatDate(course.termEndsOn)})</dd></div>
-              {course.departmentName && <div><dt className="meta">Programme area</dt><dd style={{ margin: 0 }}>{course.departmentName}</dd></div>}
-              <div><dt className="meta">Training team</dt><dd style={{ margin: 0 }}>{course.teachers.length ? course.teachers.map((t) => <span className="teacher-line" key={t.id}><TeacherAvatar />{t.fullName}{t.isLead ? ' (lead)' : ''}</span>) : 'To be assigned'}</dd></div>
-              {course.audience && <div><dt className="meta">Who it is for</dt><dd style={{ margin: 0 }}>{course.audience}</dd></div>}
-              <div><dt className="meta">Delivery</dt><dd style={{ margin: 0 }}>{DELIVERY_LABEL[course.deliveryMode]}</dd></div>
-              <div><dt className="meta">Assessment and certificate</dt><dd style={{ margin: 0 }}>{course.deliveryMode === 'online'
-                ? 'Online coursework and quizzes. Completing learners receive a CBID Institute certificate.'
-                : 'Online coursework, then a supervised assessment at CBID Institute, Karachi. Completing learners receive a CBID Institute certificate.'}</dd></div>
-              <div><dt className="meta">Enrolled</dt><dd style={{ margin: 0 }}>{course.enrolledCount}{course.capacity ? ` of ${course.capacity} places` : ' learners'}</dd></div>
-            </dl>
-          </div>
-        </section>
+
         {learner && course.enrollmentStatus === 'active' && course.status === 'published' && (
-          <button type="button" className="btn btn--ghost" onClick={() => setLeaving(true)}>Withdraw from this course</button>
+          <button type="button" className="btn btn--ghost overview-withdraw" onClick={() => setLeaving(true)}>
+            Withdraw from this course
+          </button>
         )}
       </aside>
+
       {isStaff && <EditCourse open={editing} onClose={() => setEditing(false)} />}
       <ConfirmDialog open={leaving} onClose={() => setLeaving(false)} title={`Withdraw from ${course.code}?`} danger confirmLabel="Withdraw"
         busy={withdraw.isPending} onConfirm={() => withdraw.mutate()}

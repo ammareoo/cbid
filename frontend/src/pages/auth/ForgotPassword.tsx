@@ -32,23 +32,27 @@ export default function ForgotPassword() {
 
   return (
     <AuthLayout>
-      <div className="stack-sm">
-        <h1>Reset your password</h1>
-        <p className="muted">We will email you a link to choose a new password. The link works once and expires after 30 minutes.</p>
+      <div className="auth__panel">
+        <header className="auth__panel-head">
+          <h1>Reset your password</h1>
+          <p className="auth__panel-lede">We’ll email a one-time link that expires in 30 minutes.</p>
+        </header>
+        {sent ? (
+          <div className="auth__panel-form">
+            <Notice tone="ok"><p><MailCheck aria-hidden="true" width={16} height={16} /> If an account exists for <strong>{email}</strong>, a reset link is on its way. Check your inbox and spam folder.</p></Notice>
+            <p className="auth__panel-forgot"><Link to="/login">Back to sign in</Link></p>
+          </div>
+        ) : (
+          <form className="auth__panel-form" onSubmit={submit} noValidate>
+            <ErrorSummary error={error} />
+            <TextField label="Email address" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} error={fieldError} autoFocus />
+            <div className="auth__panel-actions">
+              <button className="btn btn--primary btn--block" type="submit" disabled={busy}>{busy ? 'Sending…' : 'Send reset link'}</button>
+              <p className="auth__panel-forgot"><Link to="/login">Back to sign in</Link></p>
+            </div>
+          </form>
+        )}
       </div>
-      {sent ? (
-        <div className="stack">
-          <Notice tone="ok"><p><MailCheck aria-hidden="true" width={16} height={16} /> If an account exists for <strong>{email}</strong>, a reset link is on its way. Check your inbox and spam folder.</p></Notice>
-          <p><Link to="/login">Back to sign in</Link></p>
-        </div>
-      ) : (
-        <form className="stack" onSubmit={submit} noValidate>
-          <ErrorSummary error={error} />
-          <TextField label="Email address" type="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} error={fieldError} autoFocus />
-          <button className="btn btn--primary btn--block" type="submit" disabled={busy}>{busy ? 'Sending…' : 'Send reset link'}</button>
-          <p><Link to="/login">Back to sign in</Link></p>
-        </form>
-      )}
     </AuthLayout>
   );
 }

@@ -3,7 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Copy, Printer } from 'lucide-react';
 import { api } from '../../api/client';
 import type { Certificate } from '../../api/types';
-import { InstituteLogo, NetworkLogo, Notice, PageHeader, QueryView } from '../../components/ui';
+import { InstituteLogo, Notice, PageHeader, QueryView } from '../../components/ui';
 import { useToast } from '../../components/Toast';
 import { Page } from '../../layouts/AppShell';
 import { useDocumentTitle, type Branding } from '../../hooks/misc';
@@ -48,7 +48,6 @@ export default function CertificateView() {
             <article className="certificate" aria-label={`Certificate of completion for ${c.recipientName}`}>
               <div className="certificate__logos">
                 <InstituteLogo height={76} alt={c.branding.institute_name} />
-                <NetworkLogo height={70} alt={c.branding.organisation_name} />
               </div>
               <p className="certificate__kicker">Certificate of completion</p>
               <p className="certificate__body">This is to certify that</p>

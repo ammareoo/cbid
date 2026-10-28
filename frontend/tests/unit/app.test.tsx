@@ -62,8 +62,8 @@ describe('routing and role-based navigation', () => {
     mockApi('student');
     renderAt('/dashboard');
     expect(await screen.findByRole('heading', { level: 1, name: /Amina/ })).toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: /Course catalogue/ }).length).toBeGreaterThan(0);
-    expect(screen.queryByRole('link', { name: /Audit log/ })).not.toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Catalogue' }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('link', { name: 'Audit' })).not.toBeInTheDocument();
     expect(screen.getAllByText('You are not enrolled in any courses yet').length).toBe(1);
   });
 
@@ -76,15 +76,15 @@ describe('routing and role-based navigation', () => {
   it('shows administrators the administration navigation', async () => {
     mockApi('admin');
     renderAt('/admin');
-    expect(await screen.findByRole('heading', { name: 'Institute overview' })).toBeInTheDocument();
-    expect(screen.getAllByRole('link', { name: /Audit log/ }).length).toBeGreaterThan(0);
-    expect(screen.queryByRole('link', { name: /Course catalogue/ })).not.toBeInTheDocument();
+    expect(await screen.findByRole('heading', { level: 1, name: 'Overview' })).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: 'Audit' }).length).toBeGreaterThan(0);
+    expect(screen.queryByRole('link', { name: 'Catalogue' })).not.toBeInTheDocument();
   });
 
   it('announces unread notifications in the toolbar label', async () => {
     mockApi('teacher');
     renderAt('/dashboard');
-    expect(await screen.findByRole('link', { name: 'Notifications, 3 unread' })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Notifications, 3 unread' })).toBeInTheDocument();
   });
 });
 
@@ -113,7 +113,7 @@ describe('sign-in form', () => {
 describe('CBID Institute identity and certificates', () => {
   const json = (body: unknown, status = 200) => () => new Response(JSON.stringify(body), { status, headers: { 'content-type': 'application/json' } });
 
-  it('shows the institute logo, contact details from settings and the verification link on sign-in', async () => {
+  it('shows the institute logo and contact details from settings on sign-in', async () => {
     mockApi(null, {
       '/branding': json({ institute_name: 'CBID Institute', organisation_name: 'CBID Network PK Sindh', support_email: 'help@cbid.example',
         contact_phone: '+92 21 1234567', contact_address: 'Gulshan-e-Iqbal, Karachi', website_url: 'https://cbidnetwork.org' }),
@@ -121,14 +121,13 @@ describe('CBID Institute identity and certificates', () => {
     renderAt('/login');
     expect(await screen.findByRole('img', { name: /CBID Institute/ })).toBeInTheDocument();
     expect(await screen.findAllByRole('link', { name: 'help@cbid.example' })).not.toHaveLength(0);
-    expect(screen.getByRole('link', { name: 'Verify a certificate' })).toHaveAttribute('href', '/verify');
   });
 
   it('labels roles as Learner and gives learners a Certificates page', async () => {
     mockApi('student', { '/certificates': json({ items: [] }) });
     renderAt('/certificates');
     expect(await screen.findByRole('heading', { level: 1, name: 'Certificates' })).toBeInTheDocument();
-    expect(screen.getAllByText('Learner workspace').length).toBeGreaterThan(0);
+    expect(screen.getAllByText('Learner').length).toBeGreaterThan(0);
     expect(await screen.findByText('No certificates yet')).toBeInTheDocument();
   });
 

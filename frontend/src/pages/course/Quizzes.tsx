@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { FileQuestion, Plus } from 'lucide-react';
 import { api } from '../../api/client';
 import type { Quiz } from '../../api/types';
 import { Badge, EmptyState, PublishBadge, QueryView, SectionTitle } from '../../components/ui';
@@ -28,34 +28,47 @@ export default function Quizzes() {
   const [creating, setCreating] = useState(false);
   const q = useQuery({ queryKey: ['quizzes', course.id], queryFn: () => api.get<{ items: Quiz[] }>(`/courses/${course.id}/quizzes`) });
   return (
-    <>
-      <SectionTitle title="Quizzes" lede={isStaff ? 'Short checks marked automatically on the server.' : 'Practice checks. Your answers save as you go; scores are worked out when you submit.'}
+    <div className="course-work">
+      <SectionTitle title="Quizzes" lede={isStaff ? 'Short checks marked automatically.' : 'Practice checks. Scores are set when you submit.'}
         actions={isStaff && course.writable && <button type="button" className="btn btn--primary" onClick={() => setCreating(true)}><Plus aria-hidden="true" />New quiz</button>} />
       <QueryView q={q}>
         {(d) => d.items.length === 0 ? <EmptyState title="No quizzes yet" /> : (
-          <div className="table-wrap">
-            <table className="table">
-              <caption className="sr-only">Quizzes in {course.title}</caption>
-              <thead><tr><th scope="col">Quiz</th><th scope="col">Window</th><th scope="col">Closes</th>{isStaff ? <><th scope="col">Status</th><th scope="col" className="num">Questions</th><th scope="col" className="num">Submitted</th></> : <><th scope="col">Attempts</th><th scope="col" className="num">Best score</th></>}</tr></thead>
-              <tbody>
-                {d.items.map((x) => (
-                  <tr key={x.id}>
-                    <th scope="row"><Link to={`/courses/${course.id}/quizzes/${x.id}`}>{x.title}</Link>{x.timeLimitMinutes && <span className="meta" style={{ display: 'block' }}>{x.timeLimitMinutes}-minute limit</span>}</th>
-                    <td><QuizWindowBadge q={x} /></td>
-                    <td className="nowrap">{formatDateTime(x.closesAt)}</td>
-                    {isStaff ? (
-                      <><td><PublishBadge status={x.status} /></td><td className="num tabular">{x.questionCount}</td><td className="num tabular">{x.submittedCount}</td></>
-                    ) : (
-                      <><td>{x.openAttemptId ? <Badge tone="warn">In progress</Badge> : `${x.attemptsUsed} of ${x.maxAttempts}`}</td><td className="num tabular">{x.bestScore != null ? `${x.bestScore} / ${x.maxScore}` : '—'}</td></>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="work-list" aria-label={`Quizzes in ${course.title}`}>
+            {d.items.map((x) => (
+              <li key={x.id} className="work-row">
+                <span className="work-row__glyph" aria-hidden="true"><FileQuestion width={16} height={16} /></span>
+                <div className="work-row__main">
+                  <Link className="work-row__title" to={`/courses/${course.id}/quizzes/${x.id}`}>{x.title}</Link>
+                  <span className="work-row__meta">
+                    <span className="nowrap">Closes {formatDateTime(x.closesAt)}</span>
+                    {x.timeLimitMinutes ? <span>{x.timeLimitMinutes} min limit</span> : null}
+                    {isStaff && x.questionCount != null ? <span className="tabular">{x.questionCount} questions</span> : null}
+                  </span>
+                </div>
+                <div className="work-row__aside">
+                  <QuizWindowBadge q={x} />
+                  {isStaff ? (
+                    <>
+                      <PublishBadge status={x.status} />
+                      <span className="work-row__stat tabular">{x.submittedCount ?? 0} submitted</span>
+                    </>
+                  ) : (
+                    <>
+                      {x.openAttemptId
+                        ? <Badge tone="warn">In progress</Badge>
+                        : <span className="work-row__stat">{x.attemptsUsed} of {x.maxAttempts}</span>}
+                      <span className="work-row__stat tabular">
+                        {x.bestScore != null ? `${x.bestScore}/${x.maxScore}` : '—'}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </QueryView>
       {creating && <QuizBuilder courseId={course.id} open onClose={() => setCreating(false)} />}
-    </>
+    </div>
   );
 }

@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Archive, ExternalLink, Trash2, UserMinus, UserPlus } from 'lucide-react';
 import { api, qs } from '../../api/client';
-import { Badge, Checkbox, ConfirmDialog, EmptyState, ErrorSummary, PageHeader, PublishBadge, QueryView, SelectField, TextAreaField, TextField } from '../../components/ui';
+import { Badge, Checkbox, ConfirmDialog, EmptyState, ErrorSummary, PageHeader, PublishBadge, QueryView, Select, SelectField, TextAreaField, TextField } from '../../components/ui';
 import { useToast } from '../../components/Toast';
 import { Page } from '../../layouts/AppShell';
 import { useDebounced, useDocumentTitle } from '../../hooks/misc';
@@ -124,9 +124,9 @@ export default function AdminCourseDetail() {
                             <td><Badge tone={e.status === 'active' ? 'ok' : e.status === 'completed' ? 'info' : 'outline'}>{e.status}</Badge></td>
                             <td>
                               <label className="sr-only" htmlFor={`st-${e.id}`}>Status for {e.fullName}</label>
-                              <select id={`st-${e.id}`} className="select" style={{ minHeight: 36, width: 'auto' }} value={e.status} onChange={(ev) => setEnrolment.mutate({ id: e.id, status: ev.target.value })}>
+                              <Select id={`st-${e.id}`} tone="sm" inline style={{ minWidth: 132 }} value={e.status} onChange={(ev) => setEnrolment.mutate({ id: e.id, status: ev.target.value })}>
                                 <option value="active">Active</option><option value="completed">Completed</option><option value="dropped">Withdrawn</option>
-                              </select>
+                              </Select>
                             </td>
                           </tr>
                         ))}</tbody>

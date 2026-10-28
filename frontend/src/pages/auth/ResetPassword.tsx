@@ -38,26 +38,34 @@ export default function ResetPassword() {
 
   return (
     <AuthLayout>
-      <div className="stack-sm">
-        <h1>{invite ? 'Set up your account' : 'Choose a new password'}</h1>
-        <p className="muted">Use at least 10 characters. A short phrase of unrelated words is easy to remember and hard to guess.</p>
+      <div className="auth__panel">
+        <header className="auth__panel-head">
+          <h1>{invite ? 'Set up your account' : 'Choose a new password'}</h1>
+          <p className="auth__panel-lede">Use at least 10 characters. A short phrase of unrelated words works well.</p>
+        </header>
+        {!token ? (
+          <div className="auth__panel-form">
+            <Notice tone="warn"><p>This page needs the link from your email. <Link to="/forgot-password">Request a new link</Link>.</p></Notice>
+          </div>
+        ) : done ? (
+          <div className="auth__panel-form">
+            <Notice tone="ok"><p>Your password is set. For your security, you have been signed out everywhere else.</p></Notice>
+            <div className="auth__panel-actions">
+              <Link className="btn btn--primary btn--block" to="/login">Sign in</Link>
+            </div>
+          </div>
+        ) : (
+          <form className="auth__panel-form" onSubmit={submit} noValidate>
+            <ErrorSummary error={error} />
+            <TextField label="New password" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} autoFocus />
+            <TextField label="Confirm new password" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} error={errors.confirm} />
+            <div className="auth__panel-actions">
+              <button className="btn btn--primary btn--block" type="submit" disabled={busy}>{busy ? 'Saving…' : 'Save password'}</button>
+              <p className="auth__panel-forgot"><Link to="/forgot-password">Link expired? Request a new one</Link></p>
+            </div>
+          </form>
+        )}
       </div>
-      {!token ? (
-        <Notice tone="warn"><p>This page needs the link from your email. <Link to="/forgot-password">Request a new link</Link>.</p></Notice>
-      ) : done ? (
-        <div className="stack">
-          <Notice tone="ok"><p>Your password is set. For your security, you have been signed out everywhere else.</p></Notice>
-          <Link className="btn btn--primary" to="/login">Sign in</Link>
-        </div>
-      ) : (
-        <form className="stack" onSubmit={submit} noValidate>
-          <ErrorSummary error={error} />
-          <TextField label="New password" type="password" autoComplete="new-password" value={password} onChange={(e) => setPassword(e.target.value)} error={errors.password} autoFocus />
-          <TextField label="Confirm new password" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} error={errors.confirm} />
-          <button className="btn btn--primary btn--block" type="submit" disabled={busy}>{busy ? 'Saving…' : 'Save password'}</button>
-          <p><Link to="/forgot-password">Link expired? Request a new one</Link></p>
-        </form>
-      )}
     </AuthLayout>
   );
 }

@@ -17,42 +17,43 @@ export function ContactDetails({ compact }: { compact?: boolean }) {
 
 export function AuthLayout({ children }: { children: ReactNode }) {
   const b = useBranding();
+  const site = b.website_url.replace(/^https?:\/\//, '');
   return (
     <div className="auth">
       {/* The form comes first in reading and focus order (and on phones); on wide screens the aside sits to its left. */}
       <main className="auth__main" id="main">
         <div className="auth__card">
-          <div className="auth__mobile-brand"><InstituteLogo height={56} alt="" /></div>
-          {children}
+          <div className="auth__card-body">
+            <div className="auth__mobile-brand"><InstituteLogo height={56} alt="" /></div>
+            {children}
+          </div>
+          <footer className="auth__foot" aria-label="Contact CBID Institute">
+            <div className="auth__foot-org">
+              <NetworkLogo height={28} alt={b.organisation_name} />
+              <div className="auth__foot-org-copy">
+                <p>
+                  An initiative of {b.organisation_name}.{' '}
+                  <a href={b.website_url} rel="noopener noreferrer">{site}</a>
+                </p>
+                <ContactDetails compact />
+              </div>
+            </div>
+          </footer>
         </div>
       </main>
       <aside className="auth__aside" aria-label={`About ${b.institute_name}`}>
-        <InstituteLogo height={72} alt={`${b.institute_name}: Learn, Innovate & Implement`} />
-        <div className="stack">
-          <p className="eyebrow eyebrow--sign">Centre of Excellence of {b.organisation_name}</p>
-          <h2 style={{ fontSize: 'var(--text-3xl)' }}>Learn, innovate and implement inclusion.</h2>
-          <p>
-            Training for persons with disabilities and their families, organisations of persons with disabilities,
-            employers, educators and government. Study online, join workshops, and take your final assessment at our
-            Karachi centre.
-          </p>
-        </div>
-        <div className="sign" aria-hidden="true">
-          <div className="sign__head"><span>Your route to a certificate</span></div>
-          <ol>
-            {['Study online at your own pace', 'Practise with feedback from your trainer', 'Take your assessment onsite in Karachi', 'Receive a certificate anyone can verify'].map((t, i) => (
-              <li key={t}><div className="sign__row"><span className="sign__num">{i + 1}</span><span className="sign__title">{t}</span><span /></div></li>
-            ))}
-          </ol>
-        </div>
-        <div className="auth__org">
-          <NetworkLogo height={52} />
-          <div className="stack-sm">
-            <p>
-              An initiative of {b.organisation_name}: communities creating inclusive futures.{' '}
-              <a href={b.website_url} rel="noopener noreferrer">{b.website_url.replace(/^https:\/\//, '')}</a>
+        <div className="auth__aside-inner">
+          <div className="auth__brand">
+            <div className="auth__brand-logo">
+              <InstituteLogo fluid alt={`${b.institute_name}: Learn, Innovate & Implement`} />
+            </div>
+            <p className="auth__brand-tag">
+              <span className="auth__brand-tag-text">
+                Centre of Excellence of
+                <br />
+                {b.organisation_name}
+              </span>
             </p>
-            <ContactDetails compact />
           </div>
         </div>
       </aside>

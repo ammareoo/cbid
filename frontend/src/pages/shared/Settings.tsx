@@ -1,18 +1,59 @@
-import { useEffect, useState, type FormEvent } from 'react';
+import { useEffect, useState, type FormEvent, type ReactNode } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { Bell, Eye, KeyRound, UserRound } from 'lucide-react';
 import { api, setCsrfToken } from '../../api/client';
 import { roleLabel, useAuth } from '../../auth/AuthProvider';
-import { Checkbox, ErrorSummary, PageHeader, QueryView, SelectField, TextField } from '../../components/ui';
+import { ErrorSummary, QueryView, SelectField, TextField } from '../../components/ui';
 import { useToast } from '../../components/Toast';
 import { Page } from '../../layouts/AppShell';
 import { useDocumentTitle } from '../../hooks/misc';
-import { formatDateTime } from '../../utils/format';
+import { initials } from '../../utils/format';
 import { TeacherAvatar } from '../../components/CourseMedia';
+import { usePreferences, type DisplayPrefs } from '../../hooks/usePreferences';
 
-interface Profile { id: string; email: string; fullName: string; preferredName: string | null; role: 'student' | 'teacher' | 'admin'; timezone: string; lastLoginAt: string | null; departmentName: string | null }
+interface Profile {
+  id: string; email: string; fullName: string; preferredName: string | null;
+  role: 'student' | 'teacher' | 'admin'; timezone: string; lastLoginAt: string | null; departmentName: string | null;
+}
 interface Prefs { emailAnnouncements: boolean; emailGrades: boolean; emailDeadlines: boolean }
 
+type Section = 'profile' | 'display' | 'password' | 'email';
+
 const ZONES = ['Asia/Karachi', 'Asia/Dubai', 'Asia/Riyadh', 'Europe/London', 'America/New_York', 'America/Toronto', 'Asia/Kolkata', 'UTC'];
+
+const NAV: { id: Section; label: string; icon: typeof UserRound }[] = [
+  { id: 'profile', label: 'Edit profile', icon: UserRound },
+  { id: 'display', label: 'Display', icon: Eye },
+  { id: 'password', label: 'Password', icon: KeyRound },
+  { id: 'email', label: 'Email', icon: Bell },
+];
+
+function ProfileHero({ p }: { p: Profile }) {
+  const name = p.preferredName || p.fullName;
+  return (
+    <div className="settings-hero">
+      {p.role === 'teacher'
+        ? <TeacherAvatar className="teacher-avatar--large settings-hero__avatar" />
+        : <span className="avatar settings-hero__avatar" aria-hidden="true">{initials(p.fullName)}</span>}
+      <div className="settings-hero__meta">
+        <h1 tabIndex={-1} data-page-heading className="settings-hero__name">{name}</h1>
+        <p className="settings-hero__sub">{p.email} · {roleLabel[p.role]}</p>
+      </div>
+    </div>
+  );
+}
+
+function SettingsRow({ label, hint, children }: { label: string; hint?: string; children: ReactNode }) {
+  return (
+    <div className="settings-row">
+      <div className="settings-row__label">
+        <span>{label}</span>
+        {hint && <span className="settings-row__hint">{hint}</span>}
+      </div>
+      <div className="settings-row__control">{children}</div>
+    </div>
+  );
+}
 
 function ProfileForm({ p }: { p: Profile }) {
   const qc = useQueryClient();
@@ -26,20 +67,58 @@ function ProfileForm({ p }: { p: Profile }) {
     onSuccess: () => { toast('Profile saved'); qc.invalidateQueries({ queryKey: ['me'] }); refresh(); },
   });
   return (
-    <form className="stack" onSubmit={(e) => { e.preventDefault(); m.mutate(); }} noValidate>
-      {p.role === 'teacher' && <div className="person-line"><TeacherAvatar className="teacher-avatar--large" /><strong>{p.fullName}</strong></div>}
+    <form className="settings-form" onSubmit={(e) => { e.preventDefault(); m.mutate(); }} noValidate>
       <ErrorSummary error={m.error} />
-      <div className="form-grid">
+      <SettingsRow label="Name">
         <TextField label="Full name" value={fullName} onChange={(e) => setFullName(e.target.value)} autoComplete="name" required maxLength={120} />
-        <TextField label="Preferred name (optional)" hint="Used in greetings and by your trainers." value={preferredName} onChange={(e) => setPreferredName(e.target.value)} maxLength={60} />
-        <TextField label="Email address" value={p.email} readOnly hint="Contact an administrator to change your email." />
-        <SelectField label="Time zone" hint="Deadlines are shown in this time zone." value={timezone} onChange={(e) => setTimezone(e.target.value)}>
+      </SettingsRow>
+      <SettingsRow label="Preferred name" hint="Used in greetings and by your trainers.">
+        <TextField label="Preferred name" value={preferredName} onChange={(e) => setPreferredName(e.target.value)} maxLength={60} />
+      </SettingsRow>
+      <SettingsRow label="Email" hint="Contact an administrator to change your email.">
+        <TextField label="Email address" value={p.email} readOnly />
+      </SettingsRow>
+      <SettingsRow label="Time zone" hint="Deadlines are shown in this time zone.">
+        <SelectField label="Time zone" value={timezone} onChange={(e) => setTimezone(e.target.value)}>
           {[...new Set([p.timezone, ...ZONES])].map((z) => <option key={z} value={z}>{z.replace('_', ' ')}</option>)}
         </SelectField>
+      </SettingsRow>
+      <div className="settings-form__actions">
+        <button className="btn btn--primary" type="submit" disabled={m.isPending}>{m.isPending ? 'Saving…' : 'Submit'}</button>
       </div>
-      <p className="meta">{roleLabel[p.role]}{p.departmentName ? ` · ${p.departmentName}` : ''} · last sign-in {formatDateTime(p.lastLoginAt)}</p>
-      <div className="form-actions"><button className="btn btn--primary" type="submit" disabled={m.isPending}>{m.isPending ? 'Saving…' : 'Save profile'}</button></div>
     </form>
+  );
+}
+
+function DisplaySection() {
+  const { prefs, update } = usePreferences();
+  const sizes: [DisplayPrefs['textSize'], string][] = [[100, 'Standard'], [112, 'Large'], [125, 'Larger']];
+  const themes: [DisplayPrefs['theme'], string][] = [['system', 'System'], ['light', 'Light'], ['dark', 'Dark']];
+  return (
+    <div className="settings-form">
+      <SettingsRow label="Text size">
+        <div className="settings-chips" role="radiogroup" aria-label="Text size">
+          {sizes.map(([v, l]) => (
+            <button key={v} type="button" role="radio" aria-checked={prefs.textSize === v}
+              className={`settings-chip${prefs.textSize === v ? ' is-active' : ''}`}
+              onClick={() => update({ textSize: v })}>{l}</button>
+          ))}
+        </div>
+      </SettingsRow>
+      <SettingsRow label="Colour theme">
+        <div className="settings-chips" role="radiogroup" aria-label="Colour theme">
+          {themes.map(([v, l]) => (
+            <button key={v} type="button" role="radio" aria-checked={prefs.theme === v}
+              className={`settings-chip${prefs.theme === v ? ' is-active' : ''}`}
+              onClick={() => update({ theme: v })}>{l}</button>
+          ))}
+        </div>
+      </SettingsRow>
+      <SettingsRow label="Spacing">
+        <label className="check"><input type="checkbox" checked={prefs.spacious} onChange={(e) => update({ spacious: e.target.checked })} />Wider letter and line spacing</label>
+      </SettingsRow>
+      <p className="settings-note">Saved on this device only.</p>
+    </div>
   );
 }
 
@@ -64,14 +143,22 @@ function PasswordForm() {
     m.mutate();
   }
   return (
-    <form className="stack" onSubmit={submit} noValidate>
+    <form className="settings-form" onSubmit={submit} noValidate>
       <ErrorSummary error={m.error} />
-      <div className="form-grid">
-        <div className="span-2"><TextField label="Current password" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} /></div>
-        <TextField label="New password" type="password" autoComplete="new-password" hint="At least 10 characters." value={next} onChange={(e) => setNext(e.target.value)} />
+      <SettingsRow label="Current">
+        <TextField label="Current password" type="password" autoComplete="current-password" value={current} onChange={(e) => setCurrent(e.target.value)} />
+      </SettingsRow>
+      <SettingsRow label="New" hint="At least 10 characters.">
+        <TextField label="New password" type="password" autoComplete="new-password" value={next} onChange={(e) => setNext(e.target.value)} />
+      </SettingsRow>
+      <SettingsRow label="Confirm">
         <TextField label="Confirm new password" type="password" autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} error={local} />
+      </SettingsRow>
+      <div className="settings-form__actions">
+        <button className="btn btn--primary" type="submit" disabled={m.isPending || !current || !next}>
+          {m.isPending ? 'Changing…' : 'Change password'}
+        </button>
       </div>
-      <div className="form-actions"><button className="btn btn--primary" type="submit" disabled={m.isPending || !current || !next}>{m.isPending ? 'Changing…' : 'Change password'}</button></div>
     </form>
   );
 }
@@ -85,16 +172,21 @@ function NotificationPrefs() {
   return (
     <QueryView q={q}>
       {() => prefs && (
-        <form className="stack" onSubmit={(e) => { e.preventDefault(); m.mutate(prefs); }}>
+        <form className="settings-form" onSubmit={(e) => { e.preventDefault(); m.mutate(prefs); }}>
           <ErrorSummary error={m.error} />
-          <fieldset className="field">
-            <legend>Email me about</legend>
-            <Checkbox label="Course and institute announcements" checked={prefs.emailAnnouncements} onChange={(e) => setPrefs({ ...prefs, emailAnnouncements: e.target.checked })} />
-            <Checkbox label="Released grades and feedback" checked={prefs.emailGrades} onChange={(e) => setPrefs({ ...prefs, emailGrades: e.target.checked })} />
-            <Checkbox label="New assignments and quizzes" checked={prefs.emailDeadlines} onChange={(e) => setPrefs({ ...prefs, emailDeadlines: e.target.checked })} />
-          </fieldset>
-          <p className="hint">In-app notifications are always on. Password and account emails are always sent.</p>
-          <div className="form-actions"><button className="btn btn--primary" type="submit" disabled={m.isPending}>Save email preferences</button></div>
+          <SettingsRow label="Announcements">
+            <label className="check"><input type="checkbox" checked={prefs.emailAnnouncements} onChange={(e) => setPrefs({ ...prefs, emailAnnouncements: e.target.checked })} />Course and institute announcements</label>
+          </SettingsRow>
+          <SettingsRow label="Grades">
+            <label className="check"><input type="checkbox" checked={prefs.emailGrades} onChange={(e) => setPrefs({ ...prefs, emailGrades: e.target.checked })} />Released grades and feedback</label>
+          </SettingsRow>
+          <SettingsRow label="Deadlines">
+            <label className="check"><input type="checkbox" checked={prefs.emailDeadlines} onChange={(e) => setPrefs({ ...prefs, emailDeadlines: e.target.checked })} />New assignments and quizzes</label>
+          </SettingsRow>
+          <p className="settings-note">In-app notifications stay on. Password and account emails are always sent.</p>
+          <div className="settings-form__actions">
+            <button className="btn btn--primary" type="submit" disabled={m.isPending}>Save</button>
+          </div>
         </form>
       )}
     </QueryView>
@@ -102,19 +194,47 @@ function NotificationPrefs() {
 }
 
 export default function SettingsPage() {
-  useDocumentTitle('Profile and settings');
+  useDocumentTitle('Settings');
+  const [section, setSection] = useState<Section>('profile');
   const q = useQuery({ queryKey: ['me', 'profile'], queryFn: () => api.get<Profile>('/me/profile') });
+  const active = NAV.find((n) => n.id === section)!;
+
   return (
     <Page>
-      <PageHeader title="Profile and settings" lede="Your details, password and how we contact you. Display options (text size, theme) are in the toolbar." />
-      <div className="stack-lg" style={{ maxWidth: 820 }}>
-        <section className="panel" aria-labelledby="p-h"><div className="panel__head"><h2 id="p-h">Profile</h2></div>
-          <div className="panel__body"><QueryView q={q}>{(p) => <ProfileForm p={p} />}</QueryView></div></section>
-        <section className="panel" aria-labelledby="pw-h"><div className="panel__head"><h2 id="pw-h">Password</h2></div>
-          <div className="panel__body"><PasswordForm /></div></section>
-        <section className="panel" aria-labelledby="n-h"><div className="panel__head"><h2 id="n-h">Email notifications</h2></div>
-          <div className="panel__body"><NotificationPrefs /></div></section>
-      </div>
+      <QueryView q={q}>
+        {(p) => (
+          <div className="settings">
+            <ProfileHero p={p} />
+            <aside className="settings-nav" aria-label="Settings sections">
+              <p className="settings-nav__title">Settings</p>
+              {NAV.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  className={`settings-nav__item${section === item.id ? ' is-active' : ''}`}
+                  aria-current={section === item.id ? 'page' : undefined}
+                  onClick={() => setSection(item.id)}
+                >
+                  <item.icon aria-hidden="true" />
+                  {item.label}
+                </button>
+              ))}
+            </aside>
+
+            <div className="settings-main">
+              <section className="settings-card" aria-labelledby="settings-section-h">
+                <header className="settings-card__head">
+                  <h2 id="settings-section-h">{active.label}</h2>
+                </header>
+                {section === 'profile' && <ProfileForm p={p} />}
+                {section === 'display' && <DisplaySection />}
+                {section === 'password' && <PasswordForm />}
+                {section === 'email' && <NotificationPrefs />}
+              </section>
+            </div>
+          </div>
+        )}
+      </QueryView>
     </Page>
   );
 }

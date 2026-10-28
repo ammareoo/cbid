@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
-import { Plus } from 'lucide-react';
+import { ClipboardList, Plus } from 'lucide-react';
 import { api } from '../../api/client';
 import type { Assignment } from '../../api/types';
 import { Badge, EmptyState, PublishBadge, QueryView, SectionTitle } from '../../components/ui';
@@ -25,39 +25,40 @@ export default function Assignments() {
   const [creating, setCreating] = useState(false);
   const q = useQuery({ queryKey: ['assignments', course.id], queryFn: () => api.get<{ items: Assignment[]; writable: boolean }>(`/courses/${course.id}/assignments`) });
   return (
-    <>
-      <SectionTitle title="Assignments" lede={isStaff ? 'Create work, set deadlines and follow submissions.' : 'Coursework for this course. Deadlines are shown in your time zone.'}
+    <div className="course-work">
+      <SectionTitle title="Assignments" lede={isStaff ? 'Deadlines, submissions and marks.' : 'Coursework for this course.'}
         actions={isStaff && course.writable && <button type="button" className="btn btn--primary" onClick={() => setCreating(true)}><Plus aria-hidden="true" />New assignment</button>} />
       <QueryView q={q}>
         {(d) => d.items.length === 0 ? <EmptyState title="No assignments yet">{isStaff ? 'Create the first assignment for this course.' : 'Your trainer has not set any assignments yet.'}</EmptyState> : (
-          <div className="table-wrap">
-            <table className="table">
-              <caption className="sr-only">Assignments in {course.title}</caption>
-              <thead>
-                <tr>
-                  <th scope="col">Assignment</th><th scope="col">Due</th><th scope="col">{isStaff ? 'Status' : 'Your status'}</th>
-                  {isStaff && <th scope="col" className="num">Submitted</th>}
-                  {isStaff && <th scope="col" className="num">Graded</th>}
-                  <th scope="col" className="num">Points</th>
-                </tr>
-              </thead>
-              <tbody>
-                {d.items.map((a) => (
-                  <tr key={a.id}>
-                    <th scope="row"><Link to={`/courses/${course.id}/assignments/${a.id}`}>{a.title}</Link></th>
-                    <td><span className="nowrap">{formatDateTime(a.dueAt)}</span><br /><span className="meta">{relative(a.dueAt)}</span></td>
-                    <td>{isStaff ? <PublishBadge status={a.status} /> : <LearnerStatus a={a} />}</td>
-                    {isStaff && <td className="num tabular">{a.submittedCount} / {a.studentCount}</td>}
-                    {isStaff && <td className="num tabular">{a.gradedCount}</td>}
-                    <td className="num tabular">{a.pointsPossible}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="work-list" aria-label={`Assignments in ${course.title}`}>
+            {d.items.map((a) => (
+              <li key={a.id} className="work-row">
+                <span className="work-row__glyph" aria-hidden="true"><ClipboardList width={16} height={16} /></span>
+                <div className="work-row__main">
+                  <Link className="work-row__title" to={`/courses/${course.id}/assignments/${a.id}`}>{a.title}</Link>
+                  <span className="work-row__meta">
+                    <span className="nowrap">Due {formatDateTime(a.dueAt)}</span>
+                    <span>{relative(a.dueAt)}</span>
+                    <span className="tabular">{a.pointsPossible} pts</span>
+                  </span>
+                </div>
+                <div className="work-row__aside">
+                  {isStaff ? (
+                    <>
+                      <PublishBadge status={a.status} />
+                      <span className="work-row__stat tabular" title="Submitted">{a.submittedCount}/{a.studentCount} in</span>
+                      <span className="work-row__stat tabular" title="Graded">{a.gradedCount} graded</span>
+                    </>
+                  ) : (
+                    <LearnerStatus a={a} />
+                  )}
+                </div>
+              </li>
+            ))}
+          </ul>
         )}
       </QueryView>
       {creating && <AssignmentForm courseId={course.id} open onClose={() => setCreating(false)} />}
-    </>
+    </div>
   );
 }

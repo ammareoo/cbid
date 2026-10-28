@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
+import { ClipboardList, GraduationCap } from 'lucide-react';
 import { api } from '../../api/client';
 import { Badge, EmptyState, PageHeader, QueryView } from '../../components/ui';
 import { Page } from '../../layouts/AppShell';
@@ -26,11 +27,17 @@ export default function Grades() {
       <PageHeader title="Grades" lede="Grades appear once your trainer releases them. Totals count released grades only." />
       <QueryView q={q}>
         {(d) => {
-          if (!d.items.length) return <EmptyState title="No graded work yet">Assignments from your courses will be listed here.</EmptyState>;
+          if (!d.items.length) {
+            return (
+              <EmptyState title="No graded work yet" icon={<GraduationCap aria-hidden="true" />}>
+                Assignments from your courses will be listed here.
+              </EmptyState>
+            );
+          }
           const byCourse = new Map<string, Row[]>();
           d.items.forEach((r) => byCourse.set(r.courseId, [...(byCourse.get(r.courseId) ?? []), r]));
           return (
-            <div className="stack-lg">
+            <div className="my-grades">
               {[...byCourse.values()].map((rows) => {
                 const c = rows[0]!;
                 const graded = rows.filter((r) => r.score != null);
@@ -38,27 +45,44 @@ export default function Grades() {
                 const possible = graded.reduce((n, r) => n + r.pointsPossible, 0);
                 const pct = percent(earned, possible);
                 return (
-                  <section key={c.courseId} aria-labelledby={`g-${c.courseId}`} className="stack">
-                    <div className="row-between">
-                      <h2 id={`g-${c.courseId}`}><span className="code-tag">{c.courseCode}</span> {c.courseTitle}</h2>
-                      <p><strong className="tabular">{pct == null ? 'No released grades' : `${pct}%`}</strong>{pct != null && <span className="meta"> ({earned} of {possible} points released)</span>}</p>
-                    </div>
-                    <div className="table-wrap">
-                      <table className="table">
-                        <caption className="sr-only">Grades for {c.courseTitle}</caption>
-                        <thead><tr><th scope="col">Assignment</th><th scope="col">Due</th><th scope="col">Status</th><th scope="col" className="num">Score</th></tr></thead>
-                        <tbody>
-                          {rows.map((r) => (
-                            <tr key={r.assignmentId}>
-                              <th scope="row"><Link to={`/courses/${r.courseId}/assignments/${r.assignmentId}`}>{r.title}</Link></th>
-                              <td className="nowrap">{formatDate(r.dueAt)}</td>
-                              <td><GradeStatus r={r} /></td>
-                              <td className="num tabular">{r.score != null ? `${r.score} / ${r.pointsPossible}` : `— / ${r.pointsPossible}`}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
+                  <section key={c.courseId} className="my-grades__course" aria-labelledby={`g-${c.courseId}`}>
+                    <header className="my-grades__head">
+                      <div className="my-grades__identity">
+                        <span className="code-tag">{c.courseCode}</span>
+                        <h2 id={`g-${c.courseId}`} className="my-grades__title">{c.courseTitle}</h2>
+                      </div>
+                      <div className="course-stat-strip my-grades__total" role="status">
+                        <span className="course-stat-strip__label">Released total</span>
+                        <span className="course-stat-strip__value tabular">
+                          {pct == null ? '—' : `${pct}%`}
+                        </span>
+                        <span className="course-stat-strip__meta">
+                          {pct == null ? 'No released grades yet' : `${earned} of ${possible} points released`}
+                        </span>
+                      </div>
+                    </header>
+                    <ul className="work-list" aria-label={`Grades for ${c.courseTitle}`}>
+                      {rows.map((r) => (
+                        <li key={r.assignmentId} className="work-row">
+                          <span className="work-row__glyph" aria-hidden="true"><ClipboardList width={16} height={16} /></span>
+                          <div className="work-row__main">
+                            <Link className="work-row__title" to={`/courses/${r.courseId}/assignments/${r.assignmentId}`}>
+                              {r.title}
+                            </Link>
+                            <span className="work-row__meta">
+                              <span>Due {formatDate(r.dueAt)}</span>
+                              <span className="tabular">{r.pointsPossible} pts</span>
+                            </span>
+                          </div>
+                          <div className="work-row__aside">
+                            <GradeStatus r={r} />
+                            <span className="work-row__stat tabular">
+                              {r.score != null ? r.score : '—'} / {r.pointsPossible}
+                            </span>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
                   </section>
                 );
               })}

@@ -1,25 +1,26 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams, useSearchParams } from 'react-router-dom';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { CheckCircle2, Send } from 'lucide-react';
+import { ChevronLeft, Send } from 'lucide-react';
 import { api } from '../../api/client';
 import type { AssignmentView, Grade, QueueRow, Submission } from '../../api/types';
 import { Badge, Checkbox, ConfirmDialog, EmptyState, ErrorSummary, FileLink, QueryView, TextAreaField, TextField } from '../../components/ui';
 import { useToast } from '../../components/Toast';
 import { useDocumentTitle } from '../../hooks/misc';
-import { formatBytes, formatDateTime } from '../../utils/format';
+import { formatBytes, formatDateTime, initials } from '../../utils/format';
 import { useCourse } from '../course/CourseLayout';
 
 interface Work { student: { id: string; fullName: string; email: string }; submissions: Submission[]; grade: (Grade & { version: number; gradedBy?: string }) | null }
 
-function rowStatus(r: QueueRow) {
-  if (r.needsGrading) return <Badge tone="warn">Needs grading</Badge>;
-  if (r.score != null && r.releasedAt) return <Badge tone="ok" icon={<CheckCircle2 aria-hidden="true" />}>Released</Badge>;
-  if (r.score != null) return <Badge tone="info">Graded · not released</Badge>;
-  return <Badge tone="outline">No submission</Badge>;
+function queueMeta(r: QueueRow) {
+  if (r.needsGrading) return 'Needs grading';
+  if (r.score != null && r.releasedAt) return 'Released';
+  if (r.score != null) return 'Graded · held back';
+  if (r.submittedAt) return 'Submitted';
+  return 'No submission';
 }
 
-function GradePanel({ assignmentId, studentId, points, writable }: { assignmentId: string; studentId: string; points: number; writable: boolean }) {
+function GradingStudent({ assignmentId, studentId, points, writable }: { assignmentId: string; studentId: string; points: number; writable: boolean }) {
   const qc = useQueryClient();
   const toast = useToast();
   const q = useQuery({ queryKey: ['work', assignmentId, studentId], queryFn: () => api.get<Work>(`/assignments/${assignmentId}/submissions/${studentId}`) });
@@ -28,10 +29,7 @@ function GradePanel({ assignmentId, studentId, points, writable }: { assignmentI
   const [release, setRelease] = useState(false);
   const [scoreError, setScoreError] = useState<string>();
   const headingRef = useRef<HTMLHeadingElement>(null);
-  const loaded = Boolean(q.data);
-  useEffect(() => {
-    if (loaded) { headingRef.current?.scrollIntoView({ block: 'start', behavior: 'smooth' }); headingRef.current?.focus({ preventScroll: true }); }
-  }, [loaded]);
+
   useEffect(() => {
     if (q.data) {
       setScore(q.data.grade ? String(q.data.grade.score) : '');
@@ -39,6 +37,10 @@ function GradePanel({ assignmentId, studentId, points, writable }: { assignmentI
       setRelease(Boolean(q.data.grade?.releasedAt));
     }
   }, [q.data]);
+
+  useEffect(() => {
+    if (q.data) headingRef.current?.focus({ preventScroll: true });
+  }, [studentId, q.data]);
 
   const save = useMutation({
     mutationFn: () => api.put<{ version: number; newlyReleased: boolean }>(`/assignments/${assignmentId}/grades/${studentId}`, {
@@ -63,38 +65,75 @@ function GradePanel({ assignmentId, studentId, points, writable }: { assignmentI
 
   return (
     <QueryView q={q}>
-      {(w) => (
-        <div className="split">
-          <section className="stack" aria-labelledby="work-h">
-            <h3 id="work-h" tabIndex={-1} ref={headingRef}>{w.student.fullName}</h3>
-            {w.submissions.length === 0 ? <EmptyState title="No submission">You can still record a grade, for example for work handed in another way.</EmptyState> : (
-              <ol className="list">
-                {w.submissions.map((s) => (
-                  <li key={s.id} className="stack-sm">
-                    <span className="row" style={{ gap: 8 }}><strong>Attempt {s.attempt}</strong><span className="meta">{formatDateTime(s.submittedAt)}</span>{s.isLate && <Badge tone="warn">Late</Badge>}{s.attempt === w.submissions[0]?.attempt && <Badge tone="brand">Latest</Badge>}</span>
-                    {s.body && <div className="submission-body">{s.body}</div>}
-                    {s.fileId && <FileLink id={s.fileId} name={s.fileName} size={formatBytes(s.fileSize)} />}
-                  </li>
-                ))}
-              </ol>
-            )}
-          </section>
-          <section className="panel" aria-labelledby="grade-h" style={{ position: 'sticky', top: 'calc(var(--topbar-h) + 16px)' }}>
-            <div className="panel__head"><h3 id="grade-h">Grade</h3>{w.grade?.releasedAt ? <Badge tone="ok">Released</Badge> : w.grade ? <Badge tone="info">Not released</Badge> : null}</div>
-            <form className="panel__body stack" onSubmit={submit} noValidate>
-              <ErrorSummary error={save.error} />
-              <TextField label={`Score out of ${points}`} type="number" inputMode="decimal" min={0} max={points} step="0.5" value={score}
-                onChange={(e) => setScore(e.target.value)} error={scoreError} disabled={!writable} />
-              <TextAreaField label="Feedback for the learner" hint="Specific, kind and actionable. The learner sees this when the grade is released." value={feedback}
-                onChange={(e) => setFeedback(e.target.value)} maxLength={20000} disabled={!writable} />
-              <Checkbox label="Release to the learner" hint="Released grades are visible to the learner and they are notified." checked={release}
-                onChange={(e) => setRelease(e.target.checked)} disabled={!writable || Boolean(w.grade?.releasedAt)} />
-              {w.grade && <p className="meta">Last saved {formatDateTime(w.grade.gradedAt)}{w.grade.gradedBy ? ` by ${w.grade.gradedBy}` : ''} · version {w.grade.version}</p>}
-              {writable && <div className="form-actions"><button className="btn btn--primary" type="submit" disabled={save.isPending}>{save.isPending ? 'Saving…' : 'Save grade'}</button></div>}
-            </form>
-          </section>
-        </div>
-      )}
+      {(w) => {
+        const latest = w.submissions[0];
+        return (
+          <>
+            <main className="grade-stage" aria-labelledby="work-h">
+              <article className="grade-post">
+                <header className="grade-post__head">
+                  <span className="avatar grade-post__avatar" aria-hidden="true">{initials(w.student.fullName)}</span>
+                  <div className="grade-post__who">
+                    <h3 id="work-h" tabIndex={-1} ref={headingRef}>{w.student.fullName}</h3>
+                    <p className="grade-post__meta">
+                      {latest
+                        ? <>Attempt {latest.attempt} · {formatDateTime(latest.submittedAt)}{latest.isLate ? ' · Late' : ''}</>
+                        : 'No submission yet'}
+                    </p>
+                  </div>
+                  {latest && <Badge tone="brand">Latest</Badge>}
+                </header>
+                {w.submissions.length === 0 ? (
+                  <EmptyState title="No submission">You can still record a grade, for example for work handed in another way.</EmptyState>
+                ) : (
+                  <div className="grade-post__stack">
+                    {w.submissions.map((s) => (
+                      <section key={s.id} className="grade-post__attempt">
+                        {w.submissions.length > 1 && (
+                          <p className="grade-post__attempt-label">
+                            Attempt {s.attempt} · {formatDateTime(s.submittedAt)}
+                            {s.isLate && <> · <span className="grade-post__late">Late</span></>}
+                          </p>
+                        )}
+                        {s.body && <div className="submission-body submission-body--post">{s.body}</div>}
+                        {s.fileId && <FileLink id={s.fileId} name={s.fileName} size={formatBytes(s.fileSize)} />}
+                      </section>
+                    ))}
+                  </div>
+                )}
+              </article>
+            </main>
+            <aside className="grade-rail" aria-labelledby="grade-h">
+              <div className="grade-rail__head">
+                <h3 id="grade-h">Grade</h3>
+                {w.grade?.releasedAt ? <Badge tone="ok">Released</Badge> : w.grade ? <Badge tone="info">Not released</Badge> : null}
+              </div>
+              <form className="grade-rail__form stack" onSubmit={submit} noValidate>
+                <ErrorSummary error={save.error} />
+                <TextField label={`Score out of ${points}`} type="number" inputMode="decimal" min={0} max={points} step="0.5" value={score}
+                  onChange={(e) => setScore(e.target.value)} error={scoreError} disabled={!writable} />
+                <TextAreaField label="Feedback for the learner" hint="Specific, kind and actionable. The learner sees this when the grade is released." value={feedback}
+                  onChange={(e) => setFeedback(e.target.value)} maxLength={20000} disabled={!writable} />
+                <Checkbox label="Release to the learner" hint="Released grades are visible to the learner and they are notified." checked={release}
+                  onChange={(e) => setRelease(e.target.checked)} disabled={!writable || Boolean(w.grade?.releasedAt)} />
+                {w.grade && (
+                  <p className="meta grade-rail__saved">
+                    Last saved {formatDateTime(w.grade.gradedAt)}
+                    {w.grade.gradedBy ? ` by ${w.grade.gradedBy}` : ''} · version {w.grade.version}
+                  </p>
+                )}
+                {writable && (
+                  <div className="form-actions grade-rail__actions">
+                    <button className="btn btn--primary btn--block" type="submit" disabled={save.isPending}>
+                      {save.isPending ? 'Saving…' : 'Save grade'}
+                    </button>
+                  </div>
+                )}
+              </form>
+            </aside>
+          </>
+        );
+      }}
     </QueryView>
   );
 }
@@ -118,43 +157,79 @@ export default function Grading() {
   return (
     <QueryView q={a}>
       {(view) => (
-        <div className="stack-lg">
-          <div className="stack-sm">
-            <nav className="crumbs" aria-label="Breadcrumb"><ol>
-              <li><Link to={`/courses/${course.id}/assignments`}>Assignments</Link></li>
-              <li><Link to={`/courses/${course.id}/assignments/${assignmentId}`}>{view.assignment.title}</Link></li>
-              <li><span aria-current="page">Grading</span></li>
-            </ol></nav>
-            <div className="row-between">
-              <h2 tabIndex={-1} data-page-heading style={{ fontSize: 'var(--text-2xl)' }}>Grading: {view.assignment.title}</h2>
-              {view.writable && (view.stats?.unreleasedCount ?? 0) > 0 && (
-                <button type="button" className="btn btn--secondary" onClick={() => setConfirmRelease(true)}><Send aria-hidden="true" />Release {view.stats?.unreleasedCount} {view.stats?.unreleasedCount === 1 ? 'grade' : 'grades'}</button>
-              )}
-            </div>
-          </div>
+        <div className="grade-page">
           <QueryView q={queue}>
             {(qd) => (
-              <div className="table-wrap">
-                <table className="table">
-                  <caption className="sr-only">Learners and submission status</caption>
-                  <thead><tr><th scope="col">Learner</th><th scope="col">Latest submission</th><th scope="col">Status</th><th scope="col" className="num">Score</th><th scope="col"><span className="sr-only">Action</span></th></tr></thead>
-                  <tbody>
+              <div className="grade-shell">
+                <header className="grade-bar">
+                  <Link
+                    className="grade-bar__back"
+                    to={`/courses/${course.id}/assignments/${assignmentId}`}
+                    aria-label={`Back to ${view.assignment.title}`}
+                  >
+                    <ChevronLeft aria-hidden="true" />
+                  </Link>
+                  <div className="grade-bar__main">
+                    <h2 tabIndex={-1} data-page-heading className="grade-bar__title">{view.assignment.title}</h2>
+                    <p className="grade-bar__meta">
+                      <span className="code-tag code-tag--sm">{course.code}</span>
+                      Grading · {view.assignment.pointsPossible} pts
+                      {qd.items.length > 0 && <> · {qd.items.filter((r) => r.needsGrading).length} need grading</>}
+                    </p>
+                  </div>
+                  {view.writable && (view.stats?.unreleasedCount ?? 0) > 0 && (
+                    <button type="button" className="btn btn--secondary btn--sm grade-bar__action" onClick={() => setConfirmRelease(true)}>
+                      <Send aria-hidden="true" />Release {view.stats?.unreleasedCount}
+                    </button>
+                  )}
+                </header>
+                <div className="grade-workspace">
+                <aside className="grade-queue" aria-label="Learners">
+                  <p className="grade-queue__label">Learners</p>
+                  <ul className="grade-queue__list">
                     {qd.items.map((r) => (
-                      <tr key={r.studentId} aria-current={selected === r.studentId ? 'true' : undefined} style={selected === r.studentId ? { background: 'var(--brand-tint)' } : undefined}>
-                        <th scope="row">{r.fullName}</th>
-                        <td>{r.submittedAt ? <><span className="nowrap">{formatDateTime(r.submittedAt)}</span> {r.isLate && <Badge tone="warn">Late</Badge>}<br /><span className="meta">{r.attempts} attempt{r.attempts === 1 ? '' : 's'}</span></> : <span className="muted">—</span>}</td>
-                        <td>{rowStatus(r)}</td>
-                        <td className="num tabular">{r.score ?? '—'} / {view.assignment.pointsPossible}</td>
-                        <td><button type="button" className="btn btn--secondary btn--sm" onClick={() => setParams({ student: r.studentId })}>{r.score != null ? 'Review' : 'Grade'}<span className="sr-only"> {r.fullName}</span></button></td>
-                      </tr>
+                      <li key={r.studentId}>
+                        <button
+                          type="button"
+                          className={`grade-queue__item${selected === r.studentId ? ' is-active' : ''}${r.needsGrading ? ' grade-queue__item--attention' : ''}`}
+                          aria-current={selected === r.studentId ? 'true' : undefined}
+                          onClick={() => setParams({ student: r.studentId })}
+                        >
+                          <span className="avatar grade-queue__avatar" aria-hidden="true">{initials(r.fullName)}</span>
+                          <span className="grade-queue__copy">
+                            <span className="grade-queue__name">{r.fullName}</span>
+                            <span className="grade-queue__meta">{queueMeta(r)}</span>
+                          </span>
+                          <span className="grade-queue__score tabular">
+                            {r.score ?? '—'}<span className="grade-queue__denom">/{view.assignment.pointsPossible}</span>
+                          </span>
+                        </button>
+                      </li>
                     ))}
-                  </tbody>
-                </table>
+                  </ul>
+                </aside>
+
+                {selected ? (
+                  <GradingStudent
+                    key={selected}
+                    assignmentId={assignmentId}
+                    studentId={selected}
+                    points={view.assignment.pointsPossible}
+                    writable={Boolean(view.writable)}
+                  />
+                ) : (
+                  <>
+                    <main className="grade-stage grade-stage--empty">
+                      <p className="grade-stage__placeholder">Select a learner to read their submission.</p>
+                    </main>
+                    <aside className="grade-rail grade-rail--empty" aria-hidden="true" />
+                  </>
+                )}
+                </div>
               </div>
             )}
           </QueryView>
-          {selected ? <GradePanel key={selected} assignmentId={assignmentId} studentId={selected} points={view.assignment.pointsPossible} writable={Boolean(view.writable)} />
-            : <p className="muted">Choose a learner to view their work and record a grade.</p>}
+
           <ConfirmDialog open={confirmRelease} onClose={() => setConfirmRelease(false)} title="Release all saved grades?" confirmLabel="Release grades"
             busy={releaseAll.isPending} onConfirm={() => releaseAll.mutate()}
             body={<p>{view.stats?.unreleasedCount} learners will see their grade and feedback and receive a notification.</p>} />

@@ -1,16 +1,37 @@
-import { useEffect, useId, useRef, type ReactNode, type InputHTMLAttributes, type SelectHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { useEffect, useId, useRef, type ReactNode, type InputHTMLAttributes, type TextareaHTMLAttributes } from 'react';
+import { createPortal } from 'react-dom';
 import { Link } from 'react-router-dom';
 import type { UseQueryResult } from '@tanstack/react-query';
-import { AlertTriangle, CheckCircle2, CircleDashed, Clock, FileText, Info, Inbox, RefreshCw, X } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ChevronLeft, ChevronRight, CircleDashed, Clock, FileText, Info, Inbox, RefreshCw, X } from 'lucide-react';
 import { ApiError } from '../api/client';
 import { formatDateTime, relative } from '../utils/format';
-import instituteLogo from '../assets/cbid-institute-logo.webp';
 import networkLogo from '../assets/cbid-network-logo.webp';
+import { Select as SelectControl, type SelectProps } from './Select';
+export { Select } from './Select';
+
+/** Transparent institute emblem (public/). */
+export const INSTITUTE_LOGO_SRC = encodeURI('/CBID Institute Logo Emblem.png');
 
 /* ---------------------------------------------------------------- brand */
-/** CBID Institute logo (from cbidnetwork.org). Sits on a light plate so it stays legible in dark mode. */
-export function InstituteLogo({ height = 44, alt = 'CBID Institute' }: { height?: number; alt?: string }) {
-  return <img className="logo-plate" src={instituteLogo} alt={alt} height={height} width={Math.round(height * 502 / 225)} />;
+/** CBID Institute wordmark (public PNG). Use `fluid` on auth hero so width follows layout CSS. */
+export function InstituteLogo({
+  height = 44,
+  fluid,
+  alt = 'CBID Institute',
+}: {
+  height?: number;
+  fluid?: boolean;
+  alt?: string;
+}) {
+  const fixed = !fluid && height > 0;
+  return (
+    <img
+      className="logo-plate logo-plate--institute"
+      src={INSTITUTE_LOGO_SRC}
+      alt={alt}
+      {...(fixed ? { height, style: { height, width: 'auto' as const } } : {})}
+    />
+  );
 }
 
 /** CBID Network PK Sindh logo, the parent organisation. */
@@ -46,15 +67,15 @@ export function PageHeader({ title, eyebrow, lede, actions, crumbs, headingRef }
 }
 
 /** Heading for a course sub-page (the course title is the page h1). Receives focus after navigation. */
-export function SectionTitle({ title, lede, actions }: { title: ReactNode; lede?: ReactNode; actions?: ReactNode }) {
+export function SectionTitle({ title, lede, actions, headingId }: { title: ReactNode; lede?: ReactNode; actions?: ReactNode; headingId?: string }) {
   return (
-    <div className="page-header" style={{ marginBottom: 'var(--s-5)' }}>
-      <div className="stack-sm">
-        <h2 tabIndex={-1} data-page-heading style={{ fontSize: 'var(--text-2xl)' }}>{title}</h2>
-        {lede && <p className="muted" style={{ maxWidth: '62ch' }}>{lede}</p>}
+    <header className="page-header course-section-head">
+      <div className="stack-sm course-section-head__copy">
+        <h2 id={headingId} tabIndex={-1} data-page-heading>{title}</h2>
+        {lede && <p className="course-section-head__lede">{lede}</p>}
       </div>
-      {actions && <div className="row">{actions}</div>}
-    </div>
+      {actions && <div className="course-section-head__actions row">{actions}</div>}
+    </header>
   );
 }
 
@@ -147,14 +168,43 @@ export function DueLabel({ iso, done, prefix = 'Due' }: { iso: string; done?: bo
   );
 }
 
-export function ProgressBar({ value, label }: { value: number | null | undefined; label: string }) {
+export function ProgressBar({
+  value,
+  label,
+  compact,
+}: {
+  value: number | null | undefined;
+  label: string;
+  compact?: boolean;
+}) {
   const v = Math.max(0, Math.min(100, value ?? 0));
+  const bar = (
+    <div
+      className={v === 100 ? 'progress progress--complete' : 'progress'}
+      role="progressbar"
+      aria-label={label}
+      aria-valuemin={0}
+      aria-valuemax={100}
+      aria-valuenow={v}
+    >
+      <span style={{ width: `${v}%` }} />
+    </div>
+  );
+  if (compact) {
+    return (
+      <div className="progress-compact">
+        <span className="progress-compact__value tabular">{value == null ? '—' : `${v}%`}</span>
+        {bar}
+      </div>
+    );
+  }
   return (
     <div className="stack-sm">
-      <div className="row-between meta"><span>{label}</span><span className="tabular">{value == null ? 'No content yet' : `${v}%`}</span></div>
-      <div className={v === 100 ? 'progress progress--complete' : 'progress'} role="progressbar" aria-label={label} aria-valuemin={0} aria-valuemax={100} aria-valuenow={v}>
-        <span style={{ width: `${v}%` }} />
+      <div className="row-between meta">
+        <span>{label}</span>
+        <span className="tabular">{value == null ? 'No content yet' : `${v}%`}</span>
       </div>
+      {bar}
     </div>
   );
 }
@@ -169,9 +219,9 @@ export function TextField({ label, hint, error, id, ...rest }: FieldProps & Inpu
   return (
     <div className={`field${error ? ' field--error' : ''}`}>
       <label htmlFor={fid}>{label}</label>
+      <input id={fid} className="input" aria-invalid={error ? true : undefined} aria-describedby={describedBy} {...rest} />
       {hint && <p className="hint" id={`${fid}-hint`}>{hint}</p>}
       {error && <p className="field-error" id={`${fid}-err`}><AlertTriangle aria-hidden="true" /><span><span className="sr-only">Error: </span>{error}</span></p>}
-      <input id={fid} className="input" aria-invalid={error ? true : undefined} aria-describedby={describedBy} {...rest} />
     </div>
   );
 }
@@ -183,23 +233,33 @@ export function TextAreaField({ label, hint, error, id, className, ...rest }: Fi
   return (
     <div className={`field${error ? ' field--error' : ''}`}>
       <label htmlFor={fid}>{label}</label>
+      <textarea id={fid} className={`textarea ${className ?? ''}`} aria-invalid={error ? true : undefined} aria-describedby={describedBy} {...rest} />
       {hint && <p className="hint" id={`${fid}-hint`}>{hint}</p>}
       {error && <p className="field-error" id={`${fid}-err`}><AlertTriangle aria-hidden="true" /><span><span className="sr-only">Error: </span>{error}</span></p>}
-      <textarea id={fid} className={`textarea ${className ?? ''}`} aria-invalid={error ? true : undefined} aria-describedby={describedBy} {...rest} />
     </div>
   );
 }
 
-export function SelectField({ label, hint, error, id, children, ...rest }: FieldProps & SelectHTMLAttributes<HTMLSelectElement>) {
+export function SelectField({
+  label, hint, error, id, children, tone = 'md', ...rest
+}: FieldProps & SelectProps) {
   const auto = useId();
   const fid = id ?? auto;
   const describedBy = [hint ? `${fid}-hint` : '', error ? `${fid}-err` : ''].filter(Boolean).join(' ') || undefined;
   return (
     <div className={`field${error ? ' field--error' : ''}`}>
       <label htmlFor={fid}>{label}</label>
+      <SelectControl
+        id={fid}
+        tone={tone}
+        aria-invalid={error ? true : undefined}
+        aria-describedby={describedBy}
+        {...rest}
+      >
+        {children}
+      </SelectControl>
       {hint && <p className="hint" id={`${fid}-hint`}>{hint}</p>}
       {error && <p className="field-error" id={`${fid}-err`}><AlertTriangle aria-hidden="true" /><span><span className="sr-only">Error: </span>{error}</span></p>}
-      <select id={fid} className="select" aria-invalid={error ? true : undefined} aria-describedby={describedBy} {...rest}>{children}</select>
     </div>
   );
 }
@@ -233,34 +293,65 @@ export function ErrorSummary({ error }: { error: unknown }) {
 }
 const labelFor = (path: string) => path.replace(/([A-Z])/g, ' $1').replace(/^./, (c) => c.toUpperCase()).replace(/\./g, ' › ');
 
-/* ---------------------------------------------------------------- dialog */
+/* ---------------------------------------------------------------- dialog
+ * Fixed overlay (not <dialog showModal()>) so the panel stays in the normal
+ * DOM stacking context — Cursor element select and similar tools can target it.
+ */
 export function Dialog({ open, onClose, title, children, wide, description }: {
   open: boolean; onClose: () => void; title: string; children: ReactNode; wide?: boolean; description?: string;
 }) {
-  const ref = useRef<HTMLDialogElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const onCloseRef = useRef(onClose);
   const titleId = useId();
+  const descId = useId();
+  onCloseRef.current = onClose;
+
   useEffect(() => {
-    const d = ref.current;
-    if (!d) return;
-    if (open && !d.open) d.showModal();
-    if (!open && d.open) d.close();
+    if (!open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onCloseRef.current(); };
+    window.addEventListener('keydown', onKey);
+    const t = window.setTimeout(() => {
+      const root = panelRef.current;
+      if (!root) return;
+      // Prefer a field so typing works immediately; never re-run this on parent re-renders.
+      const field = root.querySelector<HTMLElement>('textarea, input:not([type="hidden"]):not([type="button"]):not([type="submit"]), select');
+      const fallback = root.querySelector<HTMLElement>('button, [href], [tabindex]:not([tabindex="-1"])');
+      (field ?? fallback ?? root).focus();
+    }, 0);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', onKey);
+      window.clearTimeout(t);
+    };
   }, [open]);
-  return (
-    <dialog ref={ref} className={`dialog${wide ? ' dialog--wide' : ''}`} aria-labelledby={titleId} onClose={onClose}
-      onCancel={(e) => { e.preventDefault(); onClose(); }}>
-      {open && (
-        <>
-          <div className="dialog__head">
-            <div className="stack-sm">
-              <h2 id={titleId}>{title}</h2>
-              {description && <p className="muted">{description}</p>}
-            </div>
-            <button type="button" className="icon-btn" onClick={onClose} aria-label="Close dialog"><X aria-hidden="true" /></button>
+
+  if (!open) return null;
+
+  return createPortal(
+    <div className="dialog-root" role="presentation">
+      <button type="button" className="dialog-root__backdrop" aria-label="Close dialog" onClick={() => onCloseRef.current()} />
+      <div
+        ref={panelRef}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby={titleId}
+        aria-describedby={description ? descId : undefined}
+        tabIndex={-1}
+        className={`dialog${wide ? ' dialog--wide' : ''}`}
+      >
+        <div className="dialog__head">
+          <div className="stack-sm">
+            <h2 id={titleId}>{title}</h2>
+            {description && <p id={descId} className="muted">{description}</p>}
           </div>
-          <div className="dialog__body">{children}</div>
-        </>
-      )}
-    </dialog>
+          <button type="button" className="icon-btn" onClick={() => onCloseRef.current()} aria-label="Close dialog"><X aria-hidden="true" /></button>
+        </div>
+        <div className="dialog__body">{children}</div>
+      </div>
+    </div>,
+    document.body,
   );
 }
 
@@ -288,9 +379,13 @@ export function Pagination({ page, totalPages, total, onPage, noun = 'results' }
   return (
     <nav className="pagination" aria-label="Pagination">
       <p className="meta" aria-live="polite">{total} {noun} · page {page} of {totalPages}</p>
-      <div className="row">
-        <button type="button" className="btn btn--secondary btn--sm" disabled={page <= 1} onClick={() => onPage(page - 1)}>Previous</button>
-        <button type="button" className="btn btn--secondary btn--sm" disabled={page >= totalPages} onClick={() => onPage(page + 1)}>Next</button>
+      <div className="row pagination__arrows">
+        <button type="button" className="icon-btn" disabled={page <= 1} aria-label="Previous page" onClick={() => onPage(page - 1)}>
+          <ChevronLeft aria-hidden="true" />
+        </button>
+        <button type="button" className="icon-btn" disabled={page >= totalPages} aria-label="Next page" onClick={() => onPage(page + 1)}>
+          <ChevronRight aria-hidden="true" />
+        </button>
       </div>
     </nav>
   );

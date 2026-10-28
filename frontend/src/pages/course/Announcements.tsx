@@ -4,9 +4,10 @@ import { Megaphone, Trash2 } from 'lucide-react';
 import { api, qs } from '../../api/client';
 import type { Announcement, Paged } from '../../api/types';
 import { Checkbox, ConfirmDialog, EmptyState, ErrorSummary, Pagination, QueryView, SectionTitle, TextAreaField, TextField } from '../../components/ui';
+import { TeacherAvatar } from '../../components/CourseMedia';
 import { useToast } from '../../components/Toast';
 import { useDocumentTitle } from '../../hooks/misc';
-import { formatDateTime } from '../../utils/format';
+import { formatDateTime, relative } from '../../utils/format';
 import { useCourse } from './CourseLayout';
 
 export default function CourseAnnouncements() {
@@ -34,47 +35,75 @@ export default function CourseAnnouncements() {
   const canPost = isStaff && course.writable;
 
   return (
-    <>
-      <SectionTitle title="Announcements" lede="Updates from the training team for this course." />
-      <div className={canPost ? 'columns' : undefined}>
+    <div className={`course-ann${canPost ? ' course-ann--compose' : ''}`}>
+      <SectionTitle title="Announcements" lede="Updates from the training team." />
+
+      <div className="course-ann__feed">
         <QueryView q={q}>
-          {(d) => d.items.length === 0 ? <EmptyState title="No announcements yet" icon={<Megaphone aria-hidden="true" />} /> : (
-            <div className="stack">
-              <ul className="stack" style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+          {(d) => d.items.length === 0 ? (
+            <EmptyState title="No announcements yet" icon={<Megaphone aria-hidden="true" />}>
+              {canPost ? 'Post the first update for this course.' : 'Your trainer has not posted yet.'}
+            </EmptyState>
+          ) : (
+            <>
+              <ul className="ann-feed" aria-label="Course announcements">
                 {d.items.map((a) => (
                   <li key={a.id}>
-                    <article className="panel" aria-labelledby={`a-${a.id}`}>
-                      <div className="panel__body stack-sm">
-                        <div className="row-between">
-                          <span className="meta">{a.authorName} · <time dateTime={a.createdAt}>{formatDateTime(a.createdAt)}</time></span>
-                          {canPost && <button type="button" className="icon-btn" aria-label={`Delete announcement ${a.title}`} onClick={() => setDeleting(a)}><Trash2 aria-hidden="true" /></button>}
+                    <article className="ann-post" aria-labelledby={`a-${a.id}`}>
+                      <header className="ann-post__head">
+                        <TeacherAvatar />
+                        <div className="ann-post__by">
+                          <p className="ann-post__author">{a.authorName ?? 'Training team'}</p>
+                          <p className="ann-post__when">
+                            <time dateTime={a.createdAt}>{formatDateTime(a.createdAt)}</time>
+                            <span aria-hidden="true"> · </span>
+                            <span>{relative(a.createdAt)}</span>
+                          </p>
                         </div>
-                        <h3 id={`a-${a.id}`}>{a.title}</h3>
-                        <p style={{ whiteSpace: 'pre-wrap', maxWidth: '70ch' }}>{a.body}</p>
+                        {canPost && (
+                          <div className="route-tools ann-post__tools">
+                            <button type="button" className="route-tools__btn route-tools__btn--danger" aria-label={`Delete announcement ${a.title}`} onClick={() => setDeleting(a)}>
+                              <Trash2 aria-hidden="true" />
+                            </button>
+                          </div>
+                        )}
+                      </header>
+                      <div className="ann-post__body">
+                        <h3 id={`a-${a.id}`} className="ann-post__title">{a.title}</h3>
+                        <p className="ann-post__text">{a.body}</p>
                       </div>
                     </article>
                   </li>
                 ))}
               </ul>
               <Pagination page={d.page} totalPages={d.totalPages} total={d.total} onPage={setPage} noun="announcements" />
-            </div>
+            </>
           )}
         </QueryView>
-        {canPost && (
-          <aside className="panel" aria-labelledby="post-h">
-            <div className="panel__head"><h3 id="post-h">Post an announcement</h3></div>
-            <form className="panel__body stack" onSubmit={(e) => { e.preventDefault(); post.mutate(); }}>
-              <ErrorSummary error={post.error} />
-              <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} />
-              <TextAreaField label="Message" value={body} onChange={(e) => setBody(e.target.value)} maxLength={20000} />
-              <Checkbox label="Notify enrolled learners" hint="In-app, and by email for learners who opted in." checked={notify} onChange={(e) => setNotify(e.target.checked)} />
-              <div className="form-actions"><button className="btn btn--primary" type="submit" disabled={post.isPending || title.trim().length < 3 || !body.trim()}>Post</button></div>
-            </form>
-          </aside>
-        )}
       </div>
+
+      {canPost && (
+        <aside className="ann-compose" aria-labelledby="post-h">
+          <div className="ann-compose__head">
+            <p className="ann-compose__kicker" id="post-h">Compose</p>
+            <p className="ann-compose__lead">Reach everyone on this course</p>
+          </div>
+          <form className="ann-compose__form" onSubmit={(e) => { e.preventDefault(); post.mutate(); }}>
+            <ErrorSummary error={post.error} />
+            <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={200} />
+            <TextAreaField label="Message" value={body} onChange={(e) => setBody(e.target.value)} maxLength={20000} />
+            <Checkbox label="Notify enrolled learners" hint="In-app, and by email for learners who opted in." checked={notify} onChange={(e) => setNotify(e.target.checked)} />
+            <div className="form-actions">
+              <button className="btn btn--primary btn--block" type="submit" disabled={post.isPending || title.trim().length < 3 || !body.trim()}>
+                Post announcement
+              </button>
+            </div>
+          </form>
+        </aside>
+      )}
+
       <ConfirmDialog open={!!deleting} onClose={() => setDeleting(null)} danger confirmLabel="Delete" busy={del.isPending}
         title="Delete this announcement?" onConfirm={() => deleting && del.mutate(deleting.id)} body={<p>“{deleting?.title}” will be removed for everyone.</p>} />
-    </>
+    </div>
   );
 }
